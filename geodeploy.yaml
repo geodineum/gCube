@@ -1,0 +1,29 @@
+runtime:
+  # owner resolved from GEODEPLOY_DEPLOY_USER / DEPLOY_USER /
+  # /etc/geodineum/deploy.env.
+  # geodineum-code: shared framework/theme source readers (themes need gCore,
+  # so they ride the same read class). NOT a credentials group.
+  group: geodineum-code
+
+triggers:
+  - match: "**/*.php"
+    actions: [opcache-clear]
+  # gcube.built.css is a gitignored build artifact — enqueue.php serves
+  # it when present and falls back to the 14-request @import waterfall
+  # when absent. Rebuild whenever CSS sources change so production never
+  # runs in dev mode.
+  - match: "assets/css/**"
+    actions: [build]
+
+build:
+  command: scripts/build-css.sh
+
+dirty-tree:
+  strategy: stash
+
+cli:
+  commands:
+    - name: gcube contract
+      handler: scripts/cli/gcube-contract.sh
+      description: Print the gCube theme integration contract
+      category: Theme

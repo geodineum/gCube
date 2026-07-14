@@ -1,0 +1,159 @@
+/**
+ * gCube Navigation
+ *
+ * Navigation buttons and wrapper positioning.
+ *
+ * @package gCube
+ * @version 2.0.0
+ */
+
+/* ==========================================================================
+   Navigation Wrappers
+   ========================================================================== */
+
+#wrapper_left,
+#wrapper_right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    width: 100%;
+}
+
+#wrapper_left {
+    z-index: 889;
+}
+
+#wrapper_right {
+    z-index: 890;
+}
+
+/* ==========================================================================
+   Navigation Buttons
+   ========================================================================== */
+
+.navButton {
+    will-change: transform;
+    background-color: var(--nav-button-bg-color);
+    padding: var(--nav-button-padding);
+    margin-top: var(--nav-button-margin);
+    margin-left: 0.1188vmin;
+    margin-right: 0.1188vmin;
+    margin-bottom: 0.1188vmin;
+    font-size: var(--nav-button-font-size);
+    border-style: var(--nav-button-border-style);
+    border-color: var(--nav-button-border-color);
+    border-width: var(--nav-button-border-width);
+    border-radius: var(--nav-button-border-radius);
+    transition: transform 0.5s;
+    cursor: pointer;
+}
+
+.navButton:hover,
+.navButton:focus {
+    background-color: var(--nav-button-hover-bg-color);
+    border-color: var(--nav-button-hover-text-color);
+    border-width: 4px;
+    animation: groovy 4.5s ease-in-out infinite;
+    animation-delay: 23ms;
+}
+
+/* ==========================================================================
+   Navigation Button Text
+   ========================================================================== */
+
+.navName {
+    background-color: var(--nav-button-bg-color);
+    text-transform: uppercase;
+    color: var(--nav-button-text-color);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    cursor: pointer;
+    border-radius: var(--nav-button-border-radius);
+    border: none;
+    font-size: 2.3vmin;
+    align-items: center;
+    justify-content: center;
+}
+
+.navName:hover,
+.navName:focus {
+    background-color: var(--nav-button-hover-bg-color);
+    color: var(--nav-button-hover-text-color);
+}
+
+/* ==========================================================================
+   Logo Wrapper
+   ========================================================================== */
+
+#logoWrapper {
+    position: fixed;
+    top: 2vmin;
+    left: 2vmin;
+    /* Above the fullscreen reading overlay (995) and its close button (996) so
+       the home logo stays visible and clickable while reading a page. */
+    z-index: 998;
+    will-change: transform;
+}
+
+#logo_goHome {
+    max-width: 10vmin;
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    will-change: transform;
+}
+
+#logo_goHome:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+.logo {
+    position: absolute;
+    height: 75vmin;
+    width: 75vmin;
+    border-style: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#logo_spin {
+    position: absolute;
+    will-change: transform;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* ==========================================================================
+   Footer Credit
+   ========================================================================== */
+
+.site-footer {
+    position: fixed;
+    bottom: 1vmin;
+    right: 2vmin;
+    z-index: 989;
+}
+
+.gcube-credit {
+    font-size: 0.65rem;
+    color: rgba(0, 0, 0, 0.4);
+    letter-spacing: 0.5px;
+}
+
+.gcube-credit a {
+    color: rgba(0, 0, 0, 0.5);
+    text-decoration: none;
+}
+
+.gcube-credit a:hover {
+    color: var(--color-highlight, #e51022);
+    text-decoration: underline;
+}

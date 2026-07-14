@@ -1,0 +1,258 @@
+# Geodineum Site Configuration
+# ============================
+#
+# SETUP INSTRUCTIONS:
+# 1. Copy to WordPress root: /var/www/yoursite.com/wp-config-geodineum.yaml
+# 2. Set site_id (or leave commented for auto-detection from domain)
+# 3. Set metadata.environment if WP_ENVIRONMENT_TYPE is not defined
+# 4. Customize capabilities if needed (defaults work for most WordPress sites)
+# 5. Ensure ValKey ACL user exists: gnode_client_{site_id}
+#    Password file: /etc/geodineum/credentials/valkey_client_{site_id}.password
+#
+# SIMPLIFIED ARCHITECTURE (v1.1.0):
+# - ValKey credentials are auto-resolved by gNode-Client's CredentialResolver
+# - Username derived from site_id: gnode_client_{site_id}
+# - Password found in: /etc/geodineum/credentials/ (centralized)
+# - Environment auto-detected from WP_ENVIRONMENT_TYPE
+# - You only need to set: site_id (and optionally customize capabilities)
+#
+# CONFIG PRIORITY (highest to lowest):
+#   1. {WP_ROOT}/wp-config-geodineum.yaml   <- THIS FILE
+#   2. {theme}/registration.local.yaml       <- Theme override (gitignored)
+#   3. {theme}/registration.yaml             <- Theme default
+#   4. Auto-detection                        <- Fallback
+#
+# WORKS WITH: gCube and any gCore-based child theme
+#
+# Version: 2.0.0 (19-dimension schema)
+
+version: 2.0.0
+
+# Site identifier - auto-detected from domain if not set
+# Examples: your_site, example_site, example_org
+# site_id: auto
+
+# =============================================================================
+# SERVICE IDENTIFICATION
+# =============================================================================
+service:
+  type: wordpress-site
+  tier: service           # tool | service | forum | aqueduct | rome
+  update_mode: upsert     # upsert | insert | update
+
+# =============================================================================
+# gNode TOPOLOGY CAPABILITIES (23-Dimension Schema)
+# =============================================================================
+# These map to daemon's gnode_topology.lua DIMENSIONS table (10 layers, 23 axes)
+# Discovery dims 0-18: used for bucket key hashing (76 chars)
+# Storage-only dims 19-22: visual topology + temporal
+# Use semantic strings (preferred) or numeric values (0.0-1.0).
+# Full reference: daemon/functions/gnode_topology.lua VALUES table
+#
+capabilities:
+  # ---------------------------------------------------------------------------
+  # Layer 1: Interface Identity (dimensions 0-3)
+  # ---------------------------------------------------------------------------
+  protocol: http_rest
+  # Options: http_rest | graphql | grpc | websocket | gnode_stream | resp3_direct | amqp | kafka | custom_tcp
+
+  native_format: json
+  # Options: plaintext | json | xml | yaml | msgpack | protobuf | cbor | resp3 | custom_binary
+
+  api_version: 0.5
+  # Numeric value 0.0-1.0 representing API version maturity
+
+  contract_stability: stable
+  # Options: experimental | alpha | beta | stable | frozen
+
+  # ---------------------------------------------------------------------------
+  # Layer 2: Access Control (dimensions 4-6)
+  # ---------------------------------------------------------------------------
+  clearance_required: public
+  # Options: public | authenticated | authorized | privileged | confidential | classified
+
+  auth_method: session_cookie
+  # Options: none | api_key | bearer_token | session_cookie | mtls | hardware_token
+
+  data_sensitivity: internal
+  # Options: public_data | internal | confidential | pii | regulated
+
+  # ---------------------------------------------------------------------------
+  # Layer 3: Service Scope (dimension 7)
+  # ---------------------------------------------------------------------------
+  service_scope: client_facing
+  # Options: infrastructure | daemon | worker | cron_scheduled | internal_api | bff | client_facing | edge
+
+  # ---------------------------------------------------------------------------
+  # Layer 4: Functional Domain (dimensions 8-10)
+  # ---------------------------------------------------------------------------
+  domain_primary: content
+  # Options: platform | identity | configuration | storage | cache | compute | transform |
+  #          messaging | workflow | template | content | gateway | integration | analytics |
+  #          logging | ml_inference | search | notification | presentation
+
+  domain_secondary: template
+  # Same options as domain_primary
+
+  specialization: generalist
+  # Options: platform | generalist | focused | specialist | single_purpose
+
+  # ---------------------------------------------------------------------------
+  # Layer 5: Performance Profile (dimensions 11-13)
+  # ---------------------------------------------------------------------------
+  throughput_tier: professional
+  # Options: minimal | standard | professional | enterprise | hyperscale
+
+  latency_class: responsive
+  # Options: realtime | interactive | responsive | patient | batch
+
+  reliability_tier: high
+  # Options: best_effort | standard | high | critical | ultra
+
+  # ---------------------------------------------------------------------------
+  # Layer 6: Workflow Context (dimensions 14-15)
+  # ---------------------------------------------------------------------------
+  pipeline_stage: deliver
+  # Options: source | ingest | process | enrich | deliver | sink
+
+  execution_priority: normal
+  # Options: background | low | normal | high | critical
+
+  # ---------------------------------------------------------------------------
+  # Layer 7: Runtime State (dimension 16) - SET BY DAEMON
+  # ---------------------------------------------------------------------------
+  # current_load is dynamically updated by gNode daemon, do not set here
+  # Options: idle | light | moderate | heavy | saturated
+
+  # ---------------------------------------------------------------------------
+  # Layer 8: Classification (dimensions 17-18)
+  # ---------------------------------------------------------------------------
+  service_tier: service
+  # Options: tool (0.10) | service (0.30) | forum (0.50) | aqueduct (0.70) | rome (0.90)
+  # - tool: CLI utilities, scripts
+  # - service: Standard services (WordPress sites, APIs)
+  # - forum: Community/discussion platforms
+  # - aqueduct: Data pipeline services
+  # - rome: Core infrastructure (gNode daemon, ValKey)
+
+  # environment is auto-detected from WP_ENVIRONMENT_TYPE or metadata.environment
+  # Uncomment to override:
+  # environment: production
+  # Options: global (0.00) | testing (0.25) | staging (0.50) | acceptance (0.75) | production (1.00)
+
+  # ---------------------------------------------------------------------------
+  # Layer 9: Visual Topology (dims 19-21) - User-set visual positioning
+  # ---------------------------------------------------------------------------
+  user_x: 0.50                  # Center (adjustable via UI)
+  user_y: 0.50                  # Center (adjustable via UI)
+  user_z: 0.50                  # Center (adjustable via UI)
+
+  # ---------------------------------------------------------------------------
+  # Layer 10: Temporal (dim 22) - Auto-computed by gNode
+  # ---------------------------------------------------------------------------
+  # registration_order: auto    # Omit - auto-injected by Lua on first registration
+
+# =============================================================================
+# METADATA
+# =============================================================================
+# NOTE: environment is auto-detected from WP_ENVIRONMENT_TYPE if not set
+metadata:
+  type: wordpress-site
+  # theme: auto-detected from active theme
+  # theme_version: auto-detected
+  framework: gCore
+  framework_version: 2.0.0
+  # domain: auto-detected from site URL
+  gnode_mode: dual          # dual | stream_only | direct_only
+
+  # Environment for DTAP stream routing
+  # Auto-detected from WP_ENVIRONMENT_TYPE if not set
+  # Options: testing | staging | acceptance | production
+  # environment: production
+
+# =============================================================================
+# RUNTIME TRACKING
+# =============================================================================
+runtime:
+  node_id_pattern: "web-{hostname}"
+  track_started_at: true
+  track_php_version: true
+  track_wp_version: true
+  heartbeat_interval: 300   # seconds
+
+# =============================================================================
+# VALKEY CREDENTIALS
+# =============================================================================
+# Credentials are auto-resolved by gNode-Client's CredentialResolver:
+#   - Username: gnode_client_{site_id}
+#   - Password: auto-discovered from /etc/geodineum/credentials/ or /opt/geodineum/gNode/.gnode/
+#
+# To set up credentials for a new site, run:
+#   sudo /opt/geodineum/gNode/scripts/register-site.sh {site_id}
+#
+# Manual override (not recommended):
+# valkey:
+#   user: gnode_client_custom_user
+#   password_file: /custom/path/to/password
+
+# =============================================================================
+# DTAP ENVIRONMENT PROFILES
+# =============================================================================
+# Overrides applied based on active environment
+environments:
+  testing:
+    debug: true
+    log_level: trace
+    cache_ttl: 0
+  staging:
+    debug: true
+    log_level: debug
+    cache_ttl: 30
+  acceptance:
+    debug: false
+    log_level: info
+    cache_ttl: 120
+  production:
+    debug: false
+    log_level: error
+    cache_ttl: 300
+
+# =============================================================================
+# MANAGER CONFIGURATION
+# =============================================================================
+# Paths relative to theme directory
+managers:
+  cache: config/managers/CacheManager.yaml
+  security: config/managers/SecurityManager.yaml
+  api: config/managers/APIManager.yaml
+  error: config/managers/ErrorManager.yaml
+  format: config/managers/FormatManager.yaml
+  template: config/managers/TemplateRenderer.yaml
+  seo: config/managers/SEOManager.yaml
+  optimization: config/managers/OptimizationManager.yaml
+  manifest: config/managers/ManifestManager.yaml
+
+# =============================================================================
+# REGISTRATION BEHAVIOR
+# =============================================================================
+registration:
+  method: smart                       # smart | force | skip
+  check_hash_before_register: true    # Prevent duplicate registrations
+  sync_to_valkey: true                # Cache config in ValKey
+  valkey_config_ttl: 86400            # Config cache TTL (24 hours)
+
+# =============================================================================
+# ENVIRONMENT GATE (Non-Production Access Control)
+# =============================================================================
+# When environment != production, anonymous visitors see "Under Development" screen.
+# They can enter a viewkey to preview the site without WordPress login.
+#
+security:
+  viewkey: ""                # Secret key for preview access (empty = disabled)
+  viewkey_expiry: 86400      # Cookie expiry in seconds (24 hours)
+
+# =============================================================================
+# BRANDING (Gate Screen)
+# =============================================================================
+branding:
+  logo_url: ""               # URL to logo for environment gate screen

@@ -1,0 +1,304 @@
+/**
+ * gCube Face Expansion (Fullscreen Reading Mode)
+ *
+ * Double-tap/click to expand, tap edges to shrink.
+ * Two modes: "classic" (scaled cube face) or "focus" (100% viewport)
+ *
+ * @package gCube
+ * @version 2.0.0
+ */
+
+/* ==========================================================================
+   Body State Class
+   ========================================================================== */
+
+body.face-expanded-mode {
+    overflow: hidden;
+}
+
+/* When expanded, dim the original cube */
+body.face-expanded-mode #scene {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* Dim navigation when face is expanded */
+body.face-expanded-mode #wrapper_left,
+body.face-expanded-mode #wrapper_right {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+/* ==========================================================================
+   Expanded Overlay (Cloned Content)
+   ========================================================================== */
+
+.face-expanded-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 995;
+    background: var(--color-bg, #f7f5f2);
+    overflow-y: auto;
+    overflow-x: hidden;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.face-expanded-overlay.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.face-expanded-overlay .cube-face-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    min-height: 100vh;
+}
+
+.face-expanded-overlay .cube-face-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Re-enable text selection in expanded overlay (reading mode) */
+.face-expanded-overlay,
+.face-expanded-overlay * {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+/* ==========================================================================
+   Backdrop Overlay
+   ========================================================================== */
+
+.face-expand-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    z-index: 990 !important;
+}
+
+.face-expand-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 990 !important;
+}
+
+/* ==========================================================================
+   Base Expanded State
+   ========================================================================== */
+
+.face.face-expanded-active {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    transform: none !important;
+    z-index: 995 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), border-radius 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    isolation: isolate;
+}
+
+/* ==========================================================================
+   Classic Mode - Scaled Cube Face with 3D Effect
+   ========================================================================== */
+
+body.expand-mode-classic #cube.face-expanded {
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+body.expand-mode-classic .face.face-expanded-active {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    width: auto !important;
+    height: auto !important;
+    z-index: 995 !important;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.5s ease;
+    box-shadow: 0 0 80px rgba(0, 0, 0, 0.5);
+}
+
+/* Per-face transforms in classic mode */
+body.expand-mode-classic #cube.face-expanded .one.face-expanded-active {
+    transform: rotateX(90deg) translateZ(40vmin) scale(1.2) !important;
+}
+
+body.expand-mode-classic #cube.face-expanded .two.face-expanded-active {
+    transform: rotateY(0deg) translateZ(40vmin) scale(1.2) !important;
+}
+
+body.expand-mode-classic #cube.face-expanded .three.face-expanded-active {
+    transform: rotateY(90deg) translateZ(40vmin) scale(1.2) !important;
+}
+
+body.expand-mode-classic #cube.face-expanded .four.face-expanded-active {
+    transform: rotateY(180deg) translateZ(40vmin) scale(1.2) !important;
+}
+
+body.expand-mode-classic #cube.face-expanded .five.face-expanded-active {
+    transform: rotateY(-90deg) translateZ(40vmin) scale(1.2) !important;
+}
+
+body.expand-mode-classic #cube.face-expanded .six.face-expanded-active {
+    transform: rotateX(-90deg) translateZ(40vmin) scale(1.2) !important;
+}
+
+/* ==========================================================================
+   Focus Mode - 100% Viewport Fullscreen
+   ========================================================================== */
+
+body.expand-mode-focus .face.face-expanded-active {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    transform: none !important;
+    z-index: 995 !important;
+    border-radius: 0 !important;
+    background: var(--color-bg, #f7f5f2) !important;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), border-radius 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+body.expand-mode-focus .face.face-expanded-active .cube-face-container {
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+body.expand-mode-focus .face.face-expanded-active .cube-face-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* Bottom face doesn't need rotation in fullscreen */
+body.expand-mode-focus .face.six.face-expanded-active .cube-face-container {
+    transform: none !important;
+}
+
+/* ==========================================================================
+   Edge Highlight Zones
+   ========================================================================== */
+
+.face.face-expanded-active::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    border: 4px solid transparent;
+    transition: border-color 0.3s ease;
+    z-index: 997;
+}
+
+.face.face-expanded-active.edge-hover::after {
+    border-color: rgba(229, 16, 34, 0.6);
+}
+
+/* ==========================================================================
+   Close Button
+   ========================================================================== */
+
+.face-expand-close {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 996;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.face-expand-close:hover {
+    background: rgba(229, 16, 34, 0.9);
+    transform: scale(1.1);
+}
+
+.face-expand-close.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ==========================================================================
+   Expand Hint Indicator
+   ========================================================================== */
+
+.face-expand-hint {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 20;
+}
+
+.face-visible:hover .face-expand-hint {
+    opacity: 0.7;
+}
+
+.face-expanded-active .face-expand-hint {
+    display: none;
+}
+
+/* ==========================================================================
+   Geodineum .geo content — full-width dark reading surface
+   .geo is an inherently dark, gold-on-near-black system with its own 1200px
+   .stage. When a page using it is expanded, give the reading surface the dark
+   ground the system expects and lift the 800px content cap so the golden
+   layout (multi-column card-grid, wide sections) can render. Scoped with
+   :has(.geo) so ordinary posts keep their 800px light reading column.
+   ========================================================================== */
+.face-expanded-overlay:has(.geo),
+body.expand-mode-focus .face.face-expanded-active:has(.geo) {
+    background: var(--bg-0) !important;
+}
+
+.face-expanded-overlay .cube-face-content:has(.geo),
+body.expand-mode-focus .face.face-expanded-active .cube-face-content:has(.geo) {
+    max-width: 1200px;
+    padding: 0;
+}

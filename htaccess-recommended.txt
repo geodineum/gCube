@@ -1,0 +1,164 @@
+# gCube Recommended .htaccess Configuration
+# Copy this to your WordPress root .htaccess (above # BEGIN WordPress)
+#
+# Changes from default:
+# - Removed X-XSS-Protection (deprecated, modern browsers ignore it)
+# - Removed Link header (WordPress REST API discovery, not needed for public sites)
+# - Added 'immutable' to Cache-Control for static assets
+# - Removed Pragma header (HTTP/1.0 legacy)
+# - Removed Server header unset (requires ServerTokens Prod in Apache config)
+
+# BEGIN NiertoCube
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    RewriteRule ^manifest\.json$ /index.php?manifest=1 [L,QSA]
+
+    # Protect sensitive PHP files while allowing WordPress essentials
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_FILENAME} \.php$
+    RewriteCond %{REQUEST_FILENAME} !index\.php$
+    RewriteCond %{REQUEST_FILENAME} !wp-login\.php$
+    RewriteCond %{REQUEST_FILENAME} !wp-admin/.*\.php$
+    RewriteCond %{REQUEST_FILENAME} !wp-includes/.*\.php$
+    RewriteCond %{REQUEST_FILENAME} !wp-cron\.php$
+    RewriteCond %{REQUEST_FILENAME} !wp-comments-post\.php$
+    RewriteCond %{REQUEST_FILENAME} !wp-activate\.php$
+    RewriteRule ^wp-content/themes/.*\.php$ - [F,L]
+</IfModule>
+
+# Add proper MIME types
+<IfModule mod_mime.c>
+    AddType application/javascript .js
+    AddType text/css .css
+    AddType image/svg+xml .svg
+    AddType application/font-woff .woff
+    AddType application/font-woff2 .woff2
+    AddType application/json .json
+</IfModule>
+
+# Ensure proper encoding
+AddDefaultCharset UTF-8
+
+<IfModule mod_headers.c>
+    # Remove unnecessary headers (lean and clean)
+    Header unset X-Powered-By
+    Header unset X-Pingback
+    Header unset Link
+
+    # Security headers (essential only)
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+
+    # CORS headers for fonts and static assets
+    <FilesMatch "\.(ttf|ttc|otf|eot|woff|woff2|font\.css|css|js|json|svg)$">
+        Header set Access-Control-Allow-Origin "*"
+    </FilesMatch>
+
+    # Cache Control for static assets
+    <FilesMatch "\.(ico|pdf|jpg|jpeg|png|gif|js|css|swf|svg|woff|woff2)$">
+        Header set Cache-Control "max-age=31536000, public, immutable"
+        Header unset ETag
+        Header unset Pragma
+        FileETag None
+    </FilesMatch>
+</IfModule>
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # Default expiration
+    ExpiresDefault "access plus 1 month"
+
+    # Images
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+
+    # CSS, JavaScript
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType text/javascript "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+
+    # Fonts
+    ExpiresByType application/font-woff "access plus 1 year"
+    ExpiresByType application/font-woff2 "access plus 1 year"
+    ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
+    ExpiresByType application/x-font-ttf "access plus 1 year"
+    ExpiresByType font/opentype "access plus 1 year"
+</IfModule>
+
+# Gzip compression (widely supported)
+<IfModule mod_deflate.c>
+    # Enable compression for common MIME types
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE application/ld+json
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/atom+xml
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE image/x-icon
+
+    # Fonts
+    AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+    AddOutputFilterByType DEFLATE application/x-font
+    AddOutputFilterByType DEFLATE application/x-font-opentype
+    AddOutputFilterByType DEFLATE application/x-font-otf
+    AddOutputFilterByType DEFLATE application/x-font-truetype
+    AddOutputFilterByType DEFLATE application/x-font-ttf
+    AddOutputFilterByType DEFLATE font/opentype
+    AddOutputFilterByType DEFLATE font/otf
+    AddOutputFilterByType DEFLATE font/ttf
+    AddOutputFilterByType DEFLATE font/woff
+    AddOutputFilterByType DEFLATE font/woff2
+
+    # Don't compress already-compressed files
+    SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png|webp|avif)$ no-gzip dont-vary
+    SetEnvIfNoCase Request_URI \.(?:exe|t?gz|zip|bz2|sit|rar)$ no-gzip dont-vary
+    SetEnvIfNoCase Request_URI \.pdf$ no-gzip dont-vary
+    SetEnvIfNoCase Request_URI \.avi$ no-gzip dont-vary
+    SetEnvIfNoCase Request_URI \.mov$ no-gzip dont-vary
+    SetEnvIfNoCase Request_URI \.mp3$ no-gzip dont-vary
+    SetEnvIfNoCase Request_URI \.mp4$ no-gzip dont-vary
+    SetEnvIfNoCase Request_URI \.rm$ no-gzip dont-vary
+
+    # Ensure proxies cache gzipped and non-gzipped versions separately
+    <IfModule mod_headers.c>
+        Header append Vary Accept-Encoding env=!dont-vary
+    </IfModule>
+</IfModule>
+
+# Brotli compression (better than gzip, modern browsers)
+<IfModule mod_brotli.c>
+    AddOutputFilterByType BROTLI_COMPRESS text/html
+    AddOutputFilterByType BROTLI_COMPRESS text/plain
+    AddOutputFilterByType BROTLI_COMPRESS text/css
+    AddOutputFilterByType BROTLI_COMPRESS text/javascript
+    AddOutputFilterByType BROTLI_COMPRESS text/xml
+    AddOutputFilterByType BROTLI_COMPRESS application/javascript
+    AddOutputFilterByType BROTLI_COMPRESS application/x-javascript
+    AddOutputFilterByType BROTLI_COMPRESS application/json
+    AddOutputFilterByType BROTLI_COMPRESS application/ld+json
+    AddOutputFilterByType BROTLI_COMPRESS application/xml
+    AddOutputFilterByType BROTLI_COMPRESS application/xhtml+xml
+    AddOutputFilterByType BROTLI_COMPRESS application/rss+xml
+    AddOutputFilterByType BROTLI_COMPRESS application/atom+xml
+    AddOutputFilterByType BROTLI_COMPRESS image/svg+xml
+
+    # Brotli compression level (0-11, 4 is good balance)
+    BrotliCompressionQuality 4
+</IfModule>
+# END NiertoCube

@@ -1,0 +1,145 @@
+{# templates/faces/contact-form.tera - Contact Form Face #}
+<div class="cube-face-content contact-form" data-face-id="{{ face_id }}">
+  <header class="face-header">
+    <h1>Contact Us</h1>
+    <p class="description">Get in touch with {{ blog_name }}</p>
+  </header>
+
+  <main class="face-body">
+    <form id="contact-form" class="contact-form-fields"
+          hx-post="/wp-json/gcube/v1/forms/contact"
+          hx-trigger="submit"
+          hx-target="#contact-form-status"
+          hx-swap="innerHTML"
+          hx-indicator="#contact-form-loading"
+          hx-disabled-elt="button[type='submit']">
+      <div class="form-group">
+        <label for="contact-name">Your Name</label>
+        <input
+          type="text"
+          id="contact-name"
+          name="name"
+          required
+          placeholder="Enter your name">
+      </div>
+
+      <div class="form-group">
+        <label for="contact-email">Your Email</label>
+        <input
+          type="email"
+          id="contact-email"
+          name="email"
+          required
+          placeholder="your@email.com">
+      </div>
+
+      <div class="form-group">
+        <label for="contact-subject">Subject</label>
+        <input
+          type="text"
+          id="contact-subject"
+          name="subject"
+          placeholder="What's this about?">
+      </div>
+
+      <div class="form-group">
+        <label for="contact-message">Message</label>
+        <textarea
+          id="contact-message"
+          name="message"
+          rows="6"
+          required
+          placeholder="Your message here..."></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="submit-button">
+          <span class="button-text">Send Message</span>
+          <span id="contact-form-loading" class="htmx-indicator">Sending...</span>
+        </button>
+        <button type="reset" class="reset-button">
+          Clear Form
+        </button>
+      </div>
+
+      <div id="contact-form-status" class="form-status"></div>
+    </form>
+
+    {# HTMX response template for success/error messages #}
+    <template id="contact-success-template">
+      <div class="form-message success">
+        <p>Thank you for your message. We will get back to you soon.</p>
+      </div>
+    </template>
+
+    <script>
+      // Handle HTMX response to show success/error messages
+      document.body.addEventListener('htmx:afterRequest', function(evt) {
+        if (evt.detail.elt.id !== 'contact-form') return;
+
+        const statusEl = document.getElementById('contact-form-status');
+        const response = evt.detail.xhr.response;
+
+        try {
+          const data = JSON.parse(response);
+          if (data.success) {
+            statusEl.innerHTML = '<div class="form-message success"><p>' + data.message + '</p></div>';
+            evt.detail.elt.reset(); // Clear form on success
+          } else {
+            statusEl.innerHTML = '<div class="form-message error"><p>' + (data.message || 'An error occurred.') + '</p></div>';
+          }
+        } catch (e) {
+          statusEl.innerHTML = '<div class="form-message error"><p>An unexpected error occurred.</p></div>';
+        }
+      });
+
+      // Handle network errors
+      document.body.addEventListener('htmx:sendError', function(evt) {
+        if (evt.detail.elt.id !== 'contact-form') return;
+
+        const statusEl = document.getElementById('contact-form-status');
+        statusEl.innerHTML = '<div class="form-message error"><p>Network error. Please check your connection.</p></div>';
+      });
+    </script>
+
+    {% if contact_info %}
+      <aside class="contact-info">
+        <h3>Other Ways to Reach Us</h3>
+
+        {% if contact_info.email %}
+          <p class="info-item">
+            <strong>Email:</strong>
+            <a href="mailto:{{ contact_info.email }}">{{ contact_info.email }}</a>
+          </p>
+        {% endif %}
+
+        {% if contact_info.phone %}
+          <p class="info-item">
+            <strong>Phone:</strong>
+            <a href="tel:{{ contact_info.phone }}">{{ contact_info.phone }}</a>
+          </p>
+        {% endif %}
+
+        {% if contact_info.address %}
+          <p class="info-item">
+            <strong>Address:</strong>
+            <span>{{ contact_info.address }}</span>
+          </p>
+        {% endif %}
+
+        {% if contact_info.hours %}
+          <p class="info-item">
+            <strong>Business Hours:</strong>
+            <span>{{ contact_info.hours }}</span>
+          </p>
+        {% endif %}
+      </aside>
+    {% endif %}
+  </main>
+
+  <footer class="face-footer">
+    <p class="privacy-note">
+      Your information is secure and will never be shared with third parties.
+    </p>
+  </footer>
+</div>

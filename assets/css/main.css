@@ -1,0 +1,32 @@
+/**
+ * gCube Main CSS
+ *
+ * Single entry point that imports all CSS modules in correct order.
+ * This file should be the only CSS enqueued by WordPress.
+ *
+ * @package gCube
+ * @version 2.0.0
+ *
+ * Load Order (important for cascade):
+ * 1. Variables - CSS custom properties (must be first)
+ * 2. Animations - @keyframes (before elements that use them)
+ * 3. Cube Structure - 3D transforms and positioning
+ * 4. Cube Surfaces - Dual-surface pseudo-element system
+ * 5. Face Content - Content containers and layout
+ * 6. Face Expansion - Fullscreen reading mode
+ * 7. Navigation - Buttons and wrappers
+ * 8. Typography - Fonts and text styles
+ * 9. Content Types - Posts, slugs, glass mode
+ * 10. Responsive - Media queries (must be last to override)
+ */
+
+@import 'variables.css';
+@import 'animations.css';
+@import 'cube-structure.css';
+@import 'cube-surfaces.css';
+@import 'face-content.css';
+@import 'face-expansion.css';
+@import 'navigation.css';
+@import 'typography.css';
+@import 'content-types.css';
+@import 'responsive.css';

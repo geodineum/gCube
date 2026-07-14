@@ -1,0 +1,95 @@
+{# templates/components/header.tera - Global Header Component #}
+<header class="site-header">
+  <div class="header-container">
+    <div class="site-branding">
+      {% if logo %}
+        <img src="{{ logo }}" alt="{{ blog_name }}" class="site-logo">
+      {% endif %}
+
+      <a href="#" data-action="navigate-face" data-face="home" class="site-title">
+        {{ blog_name }}
+      </a>
+
+      {% if blog_description %}
+        <p class="site-description">{{ blog_description }}</p>
+      {% endif %}
+    </div>
+
+    <nav class="primary-navigation">
+      <ul class="nav-menu">
+        {% if menu_items %}
+          {% for item in menu_items %}
+            <li class="menu-item {{ item.classes }}">
+              <a
+                href="#"
+                data-action="navigate-{{ item.type }}"
+                data-target="{{ item.target }}"
+                class="menu-link">
+                {{ item.label }}
+              </a>
+
+              {% if item.children %}
+                <ul class="sub-menu">
+                  {% for child in item.children %}
+                    <li class="menu-item">
+                      <a
+                        href="#"
+                        data-action="navigate-{{ child.type }}"
+                        data-target="{{ child.target }}">
+                        {{ child.label }}
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </li>
+          {% endfor %}
+        {% else %}
+          <li><a href="#" data-action="navigate-face" data-face="home">Home</a></li>
+          <li><a href="#" data-action="navigate-face" data-face="blog">Blog</a></li>
+          <li><a href="#" data-action="navigate-face" data-face="contact">Contact</a></li>
+          <li><a href="#" data-action="navigate-face" data-face="gallery">Gallery</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      {% if show_search %}
+        <button data-action="toggle-search" class="search-toggle">
+          <span class="icon">🔍</span>
+        </button>
+      {% endif %}
+
+      {% if current_user %}
+        <button data-action="navigate-face" data-face="dashboard" class="user-button">
+          {% if current_user.avatar %}
+            <img src="{{ current_user.avatar }}" alt="{{ current_user.display_name }}" class="user-avatar-small">
+          {% else %}
+            <span class="icon">👤</span>
+          {% endif %}
+        </button>
+      {% else %}
+        <button data-action="show-login" class="login-button">
+          Log In
+        </button>
+      {% endif %}
+    </div>
+
+    <button class="mobile-menu-toggle" data-action="toggle-mobile-menu">
+      <span class="icon">☰</span>
+    </button>
+  </div>
+
+  {% if show_search %}
+    <div class="search-overlay" style="display: none;">
+      <form class="search-form" data-action="search">
+        <input
+          type="search"
+          name="s"
+          placeholder="Search..."
+          class="search-input">
+        <button type="submit" class="search-submit">Search</button>
+      </form>
+    </div>
+  {% endif %}
+</header>

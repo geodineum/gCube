@@ -1,0 +1,33 @@
+{# templates/fragments/post-card.tera - Reusable Post Card Component #}
+<article class="post-card" data-post-id="{{ post.id }}">
+  <div class="post-thumbnail">
+    {% if post.thumbnail %}
+      <img src="{{ post.thumbnail }}" alt="{{ post.title }}" loading="lazy">
+    {% else %}
+      <div class="placeholder-image"></div>
+    {% endif %}
+  </div>
+
+  <div class="post-meta">
+    <time datetime="{{ post.date_iso }}">{{ post.date_human }}</time>
+    {% if post.category %}
+      <span class="category">{{ post.category }}</span>
+    {% endif %}
+  </div>
+
+  <h3 class="post-title">
+    <a href="#" data-action="load-post" data-post-id="{{ post.id }}">
+      {{ post.title }}
+    </a>
+  </h3>
+
+  <div class="post-excerpt">
+    {{ post.excerpt | truncate(length=150) }}
+  </div>
+
+  <div class="post-actions">
+    <button class="read-more" data-action="load-post" data-post-id="{{ post.id }}">
+      Read More →
+    </button>
+  </div>
+</article>

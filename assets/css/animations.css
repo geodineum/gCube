@@ -1,0 +1,84 @@
+/**
+ * gCube Animations
+ *
+ * All @keyframes animations and transition presets.
+ *
+ * @package gCube
+ * @version 2.0.0
+ */
+
+/* ==========================================================================
+   Gradient Background Animation (reference design style)
+   ========================================================================== */
+
+@keyframes BGgrad {
+    0% {
+        background-position: 99% 0%;
+    }
+    50% {
+        background-position: 2% 100%;
+    }
+    100% {
+        background-position: 99% 0%;
+    }
+}
+
+@-webkit-keyframes BGgrad {
+    0% {
+        background-position: 99% 0%;
+    }
+    50% {
+        background-position: 2% 100%;
+    }
+    100% {
+        background-position: 99% 0%;
+    }
+}
+
+/* ==========================================================================
+   Conic Gradient Spin (hue rotation effect)
+   ========================================================================== */
+
+@keyframes BGspin {
+    0% {
+        filter: hue-rotate(0deg);
+    }
+    100% {
+        filter: hue-rotate(360deg);
+    }
+}
+
+@-webkit-keyframes BGspin {
+    0% {
+        -webkit-filter: hue-rotate(0deg);
+    }
+    100% {
+        -webkit-filter: hue-rotate(360deg);
+    }
+}
+
+/* ==========================================================================
+   Loading Spinner
+   ========================================================================== */
+
+@keyframes cube-loading-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==========================================================================
+   Navigation Button Groove Animation
+   ========================================================================== */
+
+@keyframes groovy {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+}

@@ -1,0 +1,213 @@
+/**
+ * gCube Dual-Surface System
+ *
+ * Implements front/back surfaces for each cube face using pseudo-elements.
+ * This allows different backgrounds on the exterior (front) and interior (back)
+ * of each cube face.
+ *
+ * Architecture:
+ * - .face element: Transparent container
+ * - .face::before: Front surface (visible when facing camera)
+ * - .face::after: Back surface (visible from inside the cube)
+ *
+ * Customizer sets --face-front-bg and --face-back-bg variables per face.
+ *
+ * @package gCube
+ * @version 2.0.0
+ */
+
+/* ==========================================================================
+   Front Surface (Exterior)
+   Visible when looking at the face from outside the cube
+   ========================================================================== */
+
+#cube > .face::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 1;
+
+    /* Background from CSS variable (customizer sets this per face) */
+    background: var(--face-front-bg, linear-gradient(270deg, var(--gradcolor1), var(--gradcolor2), var(--gradcolor3), var(--gradcolor4)));
+    background-size: var(--face-front-bg-size, 800% 800%);
+    background-position: center;
+    background-repeat: no-repeat;
+
+    /* Animation (customizer can disable per face) */
+    animation: var(--face-front-animation, BGgrad 15s ease infinite);
+
+    /* Only visible from the front (hide when rotated away) */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* ==========================================================================
+   Back Surface (Interior Wall)
+   Visible when looking through the cube from inside
+   ========================================================================== */
+
+#cube > .face::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+
+    /* Rotate 180deg so it faces inward */
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
+
+    /* Background from CSS variable (customizer sets this per face) */
+    background: var(--face-back-bg, var(--interior-wall-base));
+    background-size: var(--face-back-bg-size, auto);
+    background-position: center;
+    background-repeat: no-repeat;
+
+    /* No animation on interior by default */
+    animation: var(--face-back-animation, none);
+
+    /* Only visible from the back (when looking into cube) */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* ==========================================================================
+   Top/Bottom Face Interior Rotation
+   These faces need X rotation instead of Y for proper interior display
+   ========================================================================== */
+
+#cube .one::after {
+    transform: rotateX(180deg);
+    -webkit-transform: rotateX(180deg);
+}
+
+#cube .six::after {
+    transform: rotateX(180deg);
+    -webkit-transform: rotateX(180deg);
+}
+
+/* ==========================================================================
+   Per-Face Surface Variables
+   Default values - customizer overrides these dynamically
+   ========================================================================== */
+
+/* Top face */
+#cube .one {
+    --face-front-bg: linear-gradient(270deg, var(--gradcolor1), var(--gradcolor2), var(--gradcolor3), var(--gradcolor4));
+    --face-front-bg-size: 800% 800%;
+    --face-front-animation: BGgrad 15s ease infinite;
+    --face-back-bg: var(--interior-wall-one);
+}
+
+/* Front face (often glass/transparent) */
+#cube .two {
+    --face-front-bg: var(--semi-transparant);
+    --face-front-bg-size: auto;
+    --face-front-animation: none;
+    --face-back-bg: var(--interior-wall-two);
+}
+
+/* Right face */
+#cube .three {
+    --face-front-bg: linear-gradient(270deg, var(--gradcolor1), var(--gradcolor2), var(--gradcolor3), var(--gradcolor4));
+    --face-front-bg-size: 800% 800%;
+    --face-front-animation: BGgrad 15s ease infinite;
+    --face-back-bg: var(--interior-wall-three);
+}
+
+/* Back face (typically shows background image) */
+#cube .four {
+    --face-front-bg: linear-gradient(135deg, var(--gradcolor1), var(--gradcolor4));
+    --face-front-bg-size: 100% 100%;
+    --face-front-animation: none;
+    --face-back-bg: var(--interior-wall-four);
+}
+
+/* Left face */
+#cube .five {
+    --face-front-bg: linear-gradient(270deg, var(--gradcolor1), var(--gradcolor2), var(--gradcolor3), var(--gradcolor4));
+    --face-front-bg-size: 800% 800%;
+    --face-front-animation: BGgrad 15s ease infinite;
+    --face-back-bg: var(--interior-wall-five);
+}
+
+/* Bottom face */
+#cube .six {
+    --face-front-bg: linear-gradient(270deg, var(--gradcolor1), var(--gradcolor2), var(--gradcolor3), var(--gradcolor4));
+    --face-front-bg-size: 800% 800%;
+    --face-front-animation: BGgrad 15s ease infinite;
+    --face-back-bg: var(--interior-wall-six);
+}
+
+/* ==========================================================================
+   Interior Wall Presets
+   Apply via data-interior attribute: <div class="face" data-interior="metal">
+   ========================================================================== */
+
+/* Metallic interior - brushed steel look */
+#cube .face[data-interior="metal"] {
+    --face-back-bg: linear-gradient(
+        135deg,
+        rgba(70, 75, 85, 0.95) 0%,
+        rgba(50, 55, 65, 0.9) 25%,
+        rgba(80, 85, 95, 0.9) 50%,
+        rgba(50, 55, 65, 0.9) 75%,
+        rgba(70, 75, 85, 0.95) 100%
+    );
+}
+
+/* Wooden interior - warm wood tones */
+#cube .face[data-interior="wood"] {
+    --face-back-bg: linear-gradient(
+        180deg,
+        rgba(90, 60, 40, 0.95) 0%,
+        rgba(70, 45, 30, 0.9) 50%,
+        rgba(85, 55, 35, 0.92) 100%
+    );
+}
+
+/* Velvet interior - rich deep colors */
+#cube .face[data-interior="velvet"] {
+    --face-back-bg: linear-gradient(
+        135deg,
+        rgba(60, 20, 40, 0.95) 0%,
+        rgba(80, 30, 50, 0.9) 50%,
+        rgba(50, 15, 35, 0.95) 100%
+    );
+}
+
+/* Dark interior - deep shadows */
+#cube .face[data-interior="dark"] {
+    --face-back-bg: rgba(15, 15, 20, 0.98);
+}
+
+/* Light interior - bright, airy feel */
+#cube .face[data-interior="light"] {
+    --face-back-bg: rgba(240, 238, 235, 0.95);
+}
+
+/* ==========================================================================
+   Front Surface Presets
+   Apply via data-front attribute: <div class="face" data-front="glass">
+   ========================================================================== */
+
+/* Glass front - semi-transparent for see-through effect */
+#cube .face[data-front="glass"] {
+    --face-front-bg: var(--semi-transparant);
+    --face-front-animation: none;
+}
+
+/* Solid front - opaque colored front */
+#cube .face[data-front="solid"] {
+    --face-front-bg: var(--color-bg);
+    --face-front-animation: none;
+}

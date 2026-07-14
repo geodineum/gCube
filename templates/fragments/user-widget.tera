@@ -1,0 +1,70 @@
+{# templates/fragments/user-widget.tera - User Profile Widget Component #}
+<div class="user-widget" data-user-id="{{ user.id }}">
+  <div class="user-avatar">
+    {% if user.avatar %}
+      <img src="{{ user.avatar }}" alt="{{ user.display_name }}" loading="lazy">
+    {% else %}
+      <div class="default-avatar">{{ user.display_name | slice(end=1) }}</div>
+    {% endif %}
+
+    {% if user.online %}
+      <span class="online-indicator"></span>
+    {% endif %}
+  </div>
+
+  <div class="user-info">
+    <h3 class="user-name">
+      <a href="#" data-action="view-profile" data-user-id="{{ user.id }}">
+        {{ user.display_name }}
+      </a>
+    </h3>
+
+    {% if user.role %}
+      <span class="user-role {{ user.role }}">{{ user.role }}</span>
+    {% endif %}
+
+    {% if user.bio %}
+      <p class="user-bio">{{ user.bio | truncate(length=100) }}</p>
+    {% endif %}
+  </div>
+
+  {% if user.stats %}
+    <div class="user-stats">
+      {% if user.stats.posts %}
+        <span class="stat">
+          <strong>{{ user.stats.posts }}</strong> Posts
+        </span>
+      {% endif %}
+
+      {% if user.stats.comments %}
+        <span class="stat">
+          <strong>{{ user.stats.comments }}</strong> Comments
+        </span>
+      {% endif %}
+
+      {% if user.stats.followers %}
+        <span class="stat">
+          <strong>{{ user.stats.followers }}</strong> Followers
+        </span>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <div class="user-actions">
+    <button data-action="view-profile" data-user-id="{{ user.id }}" class="view-profile">
+      View Profile
+    </button>
+
+    {% if user.can_message %}
+      <button data-action="send-message" data-user-id="{{ user.id }}" class="send-message">
+        Message
+      </button>
+    {% endif %}
+
+    {% if user.can_follow %}
+      <button data-action="follow-user" data-user-id="{{ user.id }}" class="follow-user">
+        Follow
+      </button>
+    {% endif %}
+  </div>
+</div>

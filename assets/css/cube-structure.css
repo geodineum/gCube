@@ -1,0 +1,167 @@
+/**
+ * gCube 3D Structure
+ *
+ * Scene container, cube container, and face 3D transforms.
+ * This file handles the geometric positioning of the cube in 3D space.
+ *
+ * @package gCube
+ * @version 2.0.0
+ */
+
+/* ==========================================================================
+   Base Reset
+   ========================================================================== */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--color-bg);
+    font-family: 'Ubuntu', sans-serif;
+}
+
+/* ==========================================================================
+   Scene Container - 3D Perspective Space
+   ========================================================================== */
+
+#scene {
+    perspective: var(--scene-perspective, 200vmin);
+    -webkit-perspective: var(--scene-perspective, 200vmin);
+    perspective-origin: var(--scene-perspective-origin, 50% 50%);
+    -webkit-perspective-origin: var(--scene-perspective-origin, 50% 50%);
+    z-index: 1;
+
+    /* Fixed viewport - no scrolling, cube stays in place */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+
+    /* Center the cube vertically and horizontally */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ==========================================================================
+   Cube Container - 3D Transform Space
+   ========================================================================== */
+
+#cube {
+    position: relative;
+    height: var(--default-cubeheight);
+    width: var(--default-cubewidth);
+    border-radius: 2.3vmin;
+    will-change: transform;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    transition: transform 0.4s linear;
+    -webkit-transition: -webkit-transform 0.4s linear;
+}
+
+/* ==========================================================================
+   Cube Face Base Positioning
+   ========================================================================== */
+
+#cube > .face {
+    position: absolute;
+    top: 0;
+    height: var(--default-cubeheight);
+    width: var(--default-cubewidth);
+    padding: 0;
+    border-radius: var(--default-margin);
+    overflow: hidden;
+
+    /* Enable 3D children for pseudo-element surfaces */
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+
+    /* Face container is transparent - surfaces render via ::before/::after */
+    background: transparent;
+
+    /* Prevent text selection (re-enabled in expanded mode) */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* ==========================================================================
+   Face 3D Transforms (Positioning in Space)
+   ========================================================================== */
+
+/* Top face */
+#cube .one {
+    transform: rotateX(90deg) translateZ(40vmin);
+    -webkit-transform: rotateX(90deg) translateZ(40vmin);
+}
+
+/* Front face (default view) */
+#cube .two {
+    transform: translateZ(40vmin);
+    -webkit-transform: translateZ(40vmin);
+}
+
+/* Right face */
+#cube .three {
+    transform: rotateY(90deg) translateZ(40vmin);
+    -webkit-transform: rotateY(90deg) translateZ(40vmin);
+}
+
+/* Back face */
+#cube .four {
+    transform: rotateY(180deg) translateZ(40vmin);
+    -webkit-transform: rotateY(180deg) translateZ(40vmin);
+}
+
+/* Left face */
+#cube .five {
+    transform: rotateY(-90deg) translateZ(40vmin);
+    -webkit-transform: rotateY(-90deg) translateZ(40vmin);
+}
+
+/* Bottom face */
+#cube .six {
+    transform: rotateX(-90deg) translateZ(40vmin);
+    -webkit-transform: rotateX(-90deg) translateZ(40vmin);
+}
+
+/* ==========================================================================
+   Bottom Face Content Rotation
+   Content must be rotated 180deg to be readable when viewed from below
+   ========================================================================== */
+
+#cube .six .cube-face-container,
+#cube .six > .cube-face-content,
+#cube .six .on-demand-content {
+    transform: rotate(180deg) !important;
+    -webkit-transform: rotate(180deg) !important;
+    transform-origin: center center;
+}
+
+/* ==========================================================================
+   Inner Element Resets
+   Prevent cube positioning from affecting content layout
+   ========================================================================== */
+
+#cube .face div,
+#cube .face p,
+#cube .face span,
+#cube .face article,
+#cube .face section,
+#cube .face header,
+#cube .face footer,
+#cube .face main {
+    position: static;
+    height: auto;
+    width: auto;
+    background: transparent;
+    border-radius: 0;
+    overflow: visible;
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
+}

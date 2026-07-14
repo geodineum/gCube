@@ -1,0 +1,96 @@
+{# templates/components/sidebar.tera - Sidebar Widget Area Component #}
+<aside class="sidebar">
+  {% if widgets %}
+    {% for widget in widgets %}
+      <div class="sidebar-widget {{ widget.type }}">
+        {% if widget.title %}
+          <h3 class="widget-title">{{ widget.title }}</h3>
+        {% endif %}
+
+        <div class="widget-content">
+          {% if widget.type == "recent_posts" %}
+            <ul class="recent-posts-list">
+              {% for post in widget.posts %}
+                <li class="recent-post-item">
+                  {% if post.thumbnail %}
+                    <div class="post-thumbnail-small">
+                      <img src="{{ post.thumbnail }}" alt="{{ post.title }}" loading="lazy">
+                    </div>
+                  {% endif %}
+
+                  <div class="post-info">
+                    <a href="#" data-action="load-post" data-post-id="{{ post.id }}" class="post-title">
+                      {{ post.title }}
+                    </a>
+                    <time datetime="{{ post.date_iso }}">{{ post.date_human }}</time>
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+
+          {% elif widget.type == "categories" %}
+            <ul class="category-list">
+              {% for category in widget.categories %}
+                <li class="category-item">
+                  <a href="#" data-action="load-category" data-category="{{ category.slug }}">
+                    {{ category.name }}
+                    <span class="category-count">({{ category.count }})</span>
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+
+          {% elif widget.type == "tags" %}
+            <div class="tag-cloud">
+              {% for tag in widget.tags %}
+                <a
+                  href="#"
+                  data-action="load-tag"
+                  data-tag="{{ tag.slug }}"
+                  class="tag"
+                  style="font-size: {{ tag.size }}em;">
+                  {{ tag.name }}
+                </a>
+              {% endfor %}
+            </div>
+
+          {% elif widget.type == "search" %}
+            <form class="sidebar-search" data-action="search">
+              <input
+                type="search"
+                name="s"
+                placeholder="Search..."
+                class="search-input">
+              <button type="submit" class="search-submit">Search</button>
+            </form>
+
+          {% elif widget.type == "text" %}
+            <div class="text-widget">
+              {{ widget.content | safe }}
+            </div>
+
+          {% elif widget.type == "custom" %}
+            {{ widget.content | safe }}
+
+          {% else %}
+            {{ widget.content | safe }}
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    {# Default widgets if none configured #}
+    <div class="sidebar-widget">
+      <h3>Search</h3>
+      <form class="sidebar-search" data-action="search">
+        <input type="search" name="s" placeholder="Search..." class="search-input">
+        <button type="submit">Search</button>
+      </form>
+    </div>
+
+    <div class="sidebar-widget">
+      <h3>Categories</h3>
+      <p>No categories found.</p>
+    </div>
+  {% endif %}
+</aside>

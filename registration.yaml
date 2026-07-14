@@ -1,0 +1,141 @@
+# gCube Theme Registration Template
+# ==================================
+#
+# This is the DEFAULT template file for gCube theme.
+# For multi-tenant deployments, create a site-specific config at:
+#   {WP_ROOT}/wp-config-geodineum.yaml
+#
+# Config priority (highest to lowest):
+#   1. {WP_ROOT}/wp-config-geodineum.yaml  <- Site-specific (use this!)
+#   2. {theme}/registration.local.yaml     <- Theme override (gitignored)
+#   3. {theme}/registration.yaml           <- This file (fallback)
+#
+# If no config file exists, gCube auto-detects from domain.
+#
+# Version: 2.0.0 (19-dimension schema)
+
+version: 2.0.0
+
+# Auto-detected from domain if not set (e.g., your-site.example → your_site)
+# site_id: auto
+
+# Service identification for gNode topology
+service:
+  type: wordpress-site
+  tier: service
+  update_mode: upsert
+
+# =============================================================================
+# gNode Topology Capabilities (23-Dimension Schema)
+# =============================================================================
+# These map to daemon's gnode_topology.lua DIMENSIONS table (10 layers, 23 axes)
+# Discovery dims 0-18: used for bucket key hashing (76 chars)
+# Storage-only dims 19-22: visual topology + temporal
+# Values can be semantic strings (preferred) or 0.0-1.0 floats.
+# Note: current_load (dim 16) is updated dynamically by gNode at runtime
+#
+capabilities:
+  # Layer 1: Interface Identity (dimensions 0-3)
+  protocol: http_rest           # REST API for WP endpoints
+  native_format: json           # JSON responses (also HTML for pages)
+  api_version: 0.5              # API version maturity (0.0-1.0)
+  contract_stability: stable    # WordPress APIs are stable
+
+  # Layer 2: Access Control (dimensions 4-6)
+  clearance_required: public    # Mostly public content
+  auth_method: session_cookie   # WordPress session auth
+  data_sensitivity: internal    # Mix of public and internal data
+
+  # Layer 3: Service Scope (dimension 7)
+  service_scope: client_facing  # Serves end users
+
+  # Layer 4: Functional Domain (dimensions 8-10)
+  domain_primary: content       # Content management
+  domain_secondary: template    # Template rendering
+  specialization: generalist    # CMS is a generalist platform
+
+  # Layer 5: Performance Profile (dimensions 11-13)
+  throughput_tier: professional  # Handles moderate traffic
+  latency_class: responsive     # Reasonable response times
+  reliability_tier: high        # High availability expected
+
+  # Layer 6: Workflow Context (dimensions 14-15)
+  pipeline_stage: deliver       # Delivers content to users
+  execution_priority: normal    # Standard priority
+
+  # Layer 7: Runtime State (dimension 16) - SET BY DAEMON
+  # current_load is dynamically updated by gNode daemon
+
+  # Layer 8: Classification (dimensions 17-18)
+  service_tier: service         # WordPress sites are "service" tier
+  # environment: auto-detected from WP_ENVIRONMENT_TYPE
+
+  # Layer 9: Visual Topology (dims 19-21) - User-set visual positioning
+  user_x: 0.50                  # Center (adjustable via UI)
+  user_y: 0.50                  # Center (adjustable via UI)
+  user_z: 0.50                  # Center (adjustable via UI)
+
+  # Layer 10: Temporal (dim 22) - Auto-computed by gNode
+  # registration_order: auto    # Omit - auto-injected by Lua on first registration
+
+# Static metadata
+metadata:
+  type: wordpress-site
+  theme: gCube
+  theme_version: 2.0.0
+  framework: gCore
+  framework_version: 2.0.0
+  # Auto-detected: environment, domain
+  gnode_mode: dual
+
+# Runtime tracking (metadata only - not used for stream communication)
+# Note: Stream node_id is always 'default' (matches daemon's --node-id)
+runtime:
+  node_id_pattern: "web-{hostname}"
+  track_started_at: true
+  track_php_version: true
+  track_wp_version: true
+  heartbeat_interval: 300
+
+# ValKey credentials are auto-resolved by gNode-Client from site_id:
+#   Username: gnode_client_{site_id}
+#   Password: auto-discovered from /etc/geodineum/credentials/ or /opt/geodineum/gNode/.gnode/
+# No valkey: section needed in config.
+
+# DTAP environment profiles (overrides applied based on active environment)
+environments:
+  testing:
+    debug: true
+    log_level: trace
+    cache_ttl: 0
+  staging:
+    debug: true
+    log_level: debug
+    cache_ttl: 30
+  acceptance:
+    debug: false
+    log_level: info
+    cache_ttl: 120
+  production:
+    debug: false
+    log_level: error
+    cache_ttl: 300
+
+# Manager configuration files (relative to theme)
+managers:
+  cache: config/managers/CacheManager.yaml
+  security: config/managers/SecurityManager.yaml
+  api: config/managers/APIManager.yaml
+  error: config/managers/ErrorManager.yaml
+  format: config/managers/FormatManager.yaml
+  template: config/managers/TemplateRenderer.yaml
+  seo: config/managers/SEOManager.yaml
+  optimization: config/managers/OptimizationManager.yaml
+  manifest: config/managers/ManifestManager.yaml
+
+# Registration behavior
+registration:
+  method: smart
+  check_hash_before_register: true
+  sync_to_valkey: true
+  valkey_config_ttl: 86400

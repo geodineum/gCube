@@ -1,0 +1,45 @@
+{# templates/fragments/notification-toast.tera - Notification Toast Component #}
+<div class="notification-toast {{ notification.type }}" data-notification-id="{{ notification.id }}">
+  <div class="toast-icon">
+    {% if notification.type == "success" %}
+      <span>✓</span>
+    {% elif notification.type == "error" %}
+      <span>✗</span>
+    {% elif notification.type == "warning" %}
+      <span>!</span>
+    {% elif notification.type == "info" %}
+      <span>i</span>
+    {% else %}
+      <span>•</span>
+    {% endif %}
+  </div>
+
+  <div class="toast-content">
+    {% if notification.title %}
+      <h4 class="toast-title">{{ notification.title }}</h4>
+    {% endif %}
+
+    <p class="toast-message">{{ notification.message }}</p>
+
+    {% if notification.action %}
+      <div class="toast-actions">
+        <button
+          data-action="{{ notification.action.type }}"
+          data-params="{{ notification.action.params | json_encode }}"
+          class="toast-action-button">
+          {{ notification.action.label }}
+        </button>
+      </div>
+    {% endif %}
+  </div>
+
+  <button class="toast-dismiss" data-action="dismiss-notification" data-notification-id="{{ notification.id }}">
+    ×
+  </button>
+
+  {% if notification.progress %}
+    <div class="toast-progress">
+      <div class="progress-bar" style="width: {{ notification.progress }}%"></div>
+    </div>
+  {% endif %}
+</div>

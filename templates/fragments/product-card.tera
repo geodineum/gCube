@@ -1,0 +1,68 @@
+{# templates/fragments/product-card.tera - E-commerce Product Card Component #}
+<article class="product-card" data-product-id="{{ product.id }}">
+  <div class="product-image">
+    {% if product.image %}
+      <img src="{{ product.image }}" alt="{{ product.name }}" loading="lazy">
+    {% else %}
+      <div class="placeholder-image"></div>
+    {% endif %}
+
+    {% if product.badge %}
+      <span class="product-badge {{ product.badge_type }}">{{ product.badge }}</span>
+    {% endif %}
+  </div>
+
+  <div class="product-info">
+    <h3 class="product-name">{{ product.name }}</h3>
+
+    {% if product.description %}
+      <p class="product-description">
+        {{ product.description | truncate(length=100) }}
+      </p>
+    {% endif %}
+
+    <div class="product-pricing">
+      {% if product.sale_price %}
+        <span class="price sale-price">{{ product.sale_price }}</span>
+        <span class="price regular-price strikethrough">{{ product.regular_price }}</span>
+      {% else %}
+        <span class="price">{{ product.regular_price }}</span>
+      {% endif %}
+    </div>
+
+    {% if product.rating %}
+      <div class="product-rating">
+        <span class="stars">{{ product.rating_stars }}</span>
+        <span class="rating-count">({{ product.rating_count }} reviews)</span>
+      </div>
+    {% endif %}
+
+    {% if product.stock_status %}
+      <div class="stock-status {{ product.stock_status }}">
+        {% if product.stock_status == "in_stock" %}
+          <span class="status-text">In Stock</span>
+        {% elif product.stock_status == "low_stock" %}
+          <span class="status-text">Only {{ product.stock_quantity }} left!</span>
+        {% else %}
+          <span class="status-text">Out of Stock</span>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="product-actions">
+    {% if product.stock_status == "in_stock" or product.stock_status == "low_stock" %}
+      <button class="add-to-cart" data-action="add-to-cart" data-product-id="{{ product.id }}">
+        Add to Cart
+      </button>
+    {% else %}
+      <button class="notify-me" data-action="notify-restock" data-product-id="{{ product.id }}">
+        Notify When Available
+      </button>
+    {% endif %}
+
+    <button class="quick-view" data-action="quick-view" data-product-id="{{ product.id }}">
+      Quick View
+    </button>
+  </div>
+</article>

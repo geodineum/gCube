@@ -1,0 +1,95 @@
+/**
+ * gCube CSS Custom Properties (Variables)
+ *
+ * All theme-wide CSS variables defined here.
+ * These are default values - customizer-css.php overrides them dynamically.
+ *
+ * @package gCube
+ * @version 2.0.0
+ */
+
+:root {
+    /* ==========================================================================
+       Cube Dimensions
+       ========================================================================== */
+    --default-cubeheight: 80vmin;
+    --default-cubewidth: 80vmin;
+    --default-margin: 1vmin;
+
+    /* ==========================================================================
+       Theme Colors
+       ========================================================================== */
+    --color-bg: #f7f5f2;
+    --color-txt: #000000;
+    --color-border: #F5F9E9;
+    --color-highlight: #e51022;
+    --color-hover: #c40e1d;
+    --semi-transparant: rgba(255, 255, 255, 0.28);
+
+    /* ==========================================================================
+       Gradient Colors (reference design defaults - customizer overrides)
+       ========================================================================== */
+    --gradcolor1: #ee7752;
+    --gradcolor2: #e73c7e;
+    --gradcolor3: #23a6d5;
+    --gradcolor4: #23d5ab;
+
+    /* ==========================================================================
+       Interior Wall Colors (backside of faces - depth effect)
+       ========================================================================== */
+    --interior-wall-base: rgba(35, 35, 45, 0.92);
+    --interior-wall-accent: rgba(55, 55, 65, 0.85);
+    --interior-wall-one: var(--interior-wall-base);
+    --interior-wall-two: var(--interior-wall-base);
+    --interior-wall-three: var(--interior-wall-base);
+    --interior-wall-four: var(--interior-wall-base);
+    --interior-wall-five: var(--interior-wall-base);
+    --interior-wall-six: var(--interior-wall-base);
+
+    /* ==========================================================================
+       Navigation Button Variables
+       ========================================================================== */
+    --nav-button-bg-color: #ffffff;
+    --nav-button-text-color: #000000;
+    --nav-button-hover-bg-color: #e50b37;
+    --nav-button-hover-text-color: #d7a533;
+    --nav-button-padding: 10px 20px;
+    --nav-button-margin: 10px;
+    --nav-button-font-size: 16px;
+    --nav-button-border-style: solid;
+    --nav-button-border-color: #000000;
+    --nav-button-border-width: 1px;
+    --nav-button-border-radius: 20%;
+    --nav-button-min-width: 18vmin;
+    --nav-button-max-height: 5vmin;
+    --nav-wrapper-default-width: 15%;
+    --nav-button-default-min-width: 10vmin;
+    --nav-button-default-min-height: 7vmin;
+
+    /* ==========================================================================
+       Face Surface Variables (set per-face by customizer)
+       These control the ::before (front) and ::after (back) pseudo-elements
+       ========================================================================== */
+
+    /* Default front surface - animated gradient */
+    --face-front-bg: linear-gradient(270deg, var(--gradcolor1), var(--gradcolor2), var(--gradcolor3), var(--gradcolor4));
+    --face-front-bg-size: 800% 800%;
+    --face-front-animation: BGgrad 15s ease infinite;
+
+    /* Default back surface - dark interior wall */
+    --face-back-bg: var(--interior-wall-base);
+    --face-back-bg-size: auto;
+    --face-back-animation: none;
+
+    /* ==========================================================================
+       Scene & Perspective
+       ========================================================================== */
+    --scene-perspective: 200vmin;
+    --scene-perspective-origin: 50% 50%;
+
+    /* ==========================================================================
+       Scrollbar Colors
+       ========================================================================== */
+    --scrollbar-thumb: rgba(0, 0, 0, 0.2);
+    --scrollbar-track: rgba(0, 0, 0, 0.05);
+}

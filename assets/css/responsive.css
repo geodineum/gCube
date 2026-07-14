@@ -1,0 +1,307 @@
+/**
+ * gCube Responsive Design
+ *
+ * Media queries for mobile, tablet, and desktop layouts.
+ *
+ * @package gCube
+ * @version 2.0.0
+ */
+
+/* ==========================================================================
+   Mobile Phones (max-width: 428px)
+   ========================================================================== */
+
+@media only screen and (max-width: 428px) {
+    #scene {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -65%);
+    }
+
+    #wrapper_left,
+    #wrapper_right {
+        height: 20%;
+    }
+
+    .navButton {
+        max-height: 7.5vmin;
+        max-width: 8vmin;
+        margin-left: 0.39vmin;
+        margin-right: 0.55vmin;
+    }
+
+    /* Portrait orientation */
+    @media (orientation: portrait) {
+        #wrapper_left {
+            top: 0;
+            left: 0;
+        }
+
+        #wrapper_right {
+            bottom: 0;
+            left: 0;
+        }
+
+        #wrapper_left .navButton:first-child {
+            margin-left: 18vmin;
+            width: 20%;
+            margin-right: 0;
+        }
+
+        #wrapper_left .navButton {
+            margin-right: 0;
+        }
+
+        #cube {
+            margin-left: 0vmin;
+            margin-top: 25vmin;
+            margin-bottom: 0vmin;
+        }
+    }
+
+    /* Landscape orientation */
+    @media (orientation: landscape) {
+        #scene {
+            transform: translate(-50%, -50%);
+        }
+
+        #wrapper_left,
+        #wrapper_right {
+            width: 20%;
+            height: 100%;
+            flex-direction: column;
+        }
+
+        #wrapper_left {
+            left: 0;
+            top: 0;
+        }
+
+        #wrapper_right {
+            right: 0;
+            top: 0;
+        }
+
+        #cube {
+            margin-left: 0vmin;
+            margin-top: 0vmin;
+            margin-bottom: 0vmin;
+        }
+    }
+
+    /* Posts responsive */
+    .face-post-item {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .face-post-thumbnail {
+        width: 100%;
+        height: 120px;
+    }
+
+    .face-posts-container {
+        max-height: 70vh;
+        padding: 0.75rem;
+    }
+}
+
+/* ==========================================================================
+   Tablets (429px - 960px)
+   ========================================================================== */
+
+@media only screen and (min-width: 429px) and (max-width: 960px) {
+    #scene {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -65%);
+    }
+
+    #wrapper_left,
+    #wrapper_right {
+        height: 20%;
+    }
+
+    .navButton {
+        max-height: 7.5vmin;
+        max-width: 10vmin;
+        margin-left: 0.25vmin;
+        margin-right: 0.75vmin;
+    }
+
+    /* Portrait orientation */
+    @media (orientation: portrait) {
+        #wrapper_left {
+            top: 0;
+            left: 0;
+        }
+
+        #wrapper_right {
+            bottom: 0;
+            left: 0;
+        }
+
+        #wrapper_left .navButton:first-child {
+            margin-left: 18vmin;
+            width: 20%;
+            margin-right: 0;
+        }
+
+        #wrapper_left .navButton {
+            margin-right: 0;
+        }
+
+        #cube {
+            margin-left: 2vmin;
+            margin-top: 25vmin;
+        }
+    }
+
+    /* Landscape orientation */
+    @media (orientation: landscape) {
+        #scene {
+            transform: translate(-50%, -50%);
+        }
+
+        #wrapper_left,
+        #wrapper_right {
+            width: 20%;
+            height: 100%;
+            flex-direction: column;
+        }
+
+        #wrapper_left {
+            left: 0;
+            top: 0;
+        }
+
+        #wrapper_right {
+            right: 0;
+            top: 0;
+        }
+    }
+}
+
+/* ==========================================================================
+   Desktop (min-width: 961px)
+   ========================================================================== */
+
+@media (min-width: 961px) {
+    #scene {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    #wrapper_left,
+    #wrapper_right {
+        width: var(--nav-wrapper-default-width);
+        height: 100%;
+        flex-direction: column;
+    }
+
+    #wrapper_left {
+        left: 0;
+        top: 0;
+    }
+
+    #wrapper_right {
+        right: 0;
+        top: 0;
+    }
+
+    .navButton {
+        min-width: var(--nav-button-default-min-width);
+        min-height: var(--nav-button-default-min-height);
+    }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+
+@media print {
+    #scene {
+        position: static;
+        width: 100%;
+        height: auto;
+        perspective: none;
+    }
+
+    #cube {
+        transform: none !important;
+        width: 100%;
+        height: auto;
+    }
+
+    #cube > .face {
+        position: static;
+        transform: none !important;
+        width: 100%;
+        height: auto;
+        page-break-inside: avoid;
+    }
+
+    #wrapper_left,
+    #wrapper_right,
+    #logoWrapper,
+    .site-footer {
+        display: none !important;
+    }
+
+    .face-expand-close,
+    .face-expand-hint,
+    .face-expand-backdrop {
+        display: none !important;
+    }
+}
+
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    #cube,
+    #cube > .face,
+    #cube > .face::before,
+    #cube > .face::after,
+    .navButton,
+    .face-expanded-overlay,
+    .face-expand-backdrop {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* ==========================================================================
+   High Contrast Mode
+   ========================================================================== */
+
+@media (prefers-contrast: high) {
+    :root {
+        --interior-wall-base: rgba(0, 0, 0, 0.95);
+        --semi-transparant: rgba(255, 255, 255, 0.5);
+    }
+
+    .navButton {
+        border-width: 2px !important;
+    }
+}
+
+/* ==========================================================================
+   Dark Mode (if supported in future)
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+    /* Reserved for future dark mode support */
+    /* Uncomment and customize when ready:
+    :root {
+        --color-bg: #1a1a1a;
+        --color-txt: #f0f0f0;
+        --interior-wall-base: rgba(30, 30, 35, 0.95);
+    }
+    */
+}

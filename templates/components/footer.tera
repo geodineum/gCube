@@ -1,0 +1,64 @@
+{# templates/components/footer.tera - Global Footer Component #}
+<footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-widgets">
+      {% if footer_widgets %}
+        {% for widget in footer_widgets %}
+          <div class="footer-widget {{ widget.type }}">
+            {% if widget.title %}
+              <h3 class="widget-title">{{ widget.title }}</h3>
+            {% endif %}
+
+            <div class="widget-content">
+              {{ widget.content | safe }}
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="footer-widget">
+          <h3>About {{ blog_name }}</h3>
+          <p>{{ blog_description }}</p>
+        </div>
+
+        <div class="footer-widget">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="#" data-action="navigate-face" data-face="home">Home</a></li>
+            <li><a href="#" data-action="navigate-face" data-face="blog">Blog</a></li>
+            <li><a href="#" data-action="navigate-face" data-face="contact">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-widget">
+          <h3>Connect</h3>
+          <div class="social-links">
+            {% if social_links %}
+              {% for social in social_links %}
+                <a href="{{ social.url }}" target="_blank" rel="noopener" class="social-link {{ social.platform }}">
+                  <span class="icon">{{ social.icon }}</span>
+                </a>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="footer-bottom">
+      <div class="copyright">
+        &copy; {{ current_year }} {{ blog_name }}. All rights reserved.
+      </div>
+
+      <nav class="footer-nav">
+        <a href="#" data-action="load-page" data-page-slug="privacy">Privacy Policy</a>
+        <a href="#" data-action="load-page" data-page-slug="terms">Terms of Service</a>
+      </nav>
+
+      <div class="footer-credits">
+        <span>Powered by gCube</span>
+        <span>|</span>
+        <span>Rendered by gNode</span>
+      </div>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,23 @@
+/*
+Theme Name: gCube
+Theme URI: https://github.com/geodineum/gCube
+Template: gtemplate
+Description: 3D Cube WordPress theme with gNode-powered Tera template rendering. Child theme of gTemplate, built on the gCore framework with geometric service discovery and multi-tenant support.
+Version: 1.0.0
+Requires at least: 5.2
+Tested up to: 6.4
+Requires PHP: 7.4
+Author: Geodineum
+Author URI: https://github.com/geodineum
+License: MIT OR Apache-2.0
+License URI: https://opensource.org/licenses/MIT
+Text Domain: gcube
+Tags: custom-template, 3d-interface, performance, htmx, geometric-service-mesh, distributed-systems
+
+gCube Child Theme (of gTemplate)
+Built with: gCore framework, gNode daemon, Tera templates, HTMX
+Architecture: Platform-aware, multi-tenant, O(1) service discovery
+*/
+
+/* Theme styles are loaded from assets/css/ */
+/* This file is required by WordPress for theme recognition */

@@ -1,0 +1,235 @@
+/**
+ * gCube Face Content Layout
+ *
+ * Containers, scrolling, content layout within cube faces.
+ *
+ * @package gCube
+ * @version 2.0.0
+ */
+
+/* ==========================================================================
+   Face Content Container
+   ========================================================================== */
+
+#cube .face .cube-face-container,
+.cube-face-container {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2; /* Above pseudo-element surfaces */
+
+    /* Scrolling behavior */
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    /* Hide scrollbars */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+
+    /* Transparent to show face background through */
+    background: transparent;
+}
+
+/* Hide scrollbars (Chrome, Safari, Opera) */
+.cube-face-container::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+/* ==========================================================================
+   Face Content Wrapper
+   ========================================================================== */
+
+.cube-face-content {
+    position: relative;
+    width: 100%;
+    min-height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    background: transparent;
+}
+
+/* Content hidden from behind to prevent mirrored text */
+#cube .face .cube-face-container,
+#cube .face .cube-face-content {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* Back face content - ensure transparent */
+#cube .four .cube-face-container,
+#cube .four .cube-face-content {
+    background: transparent !important;
+}
+
+/* ==========================================================================
+   Content Sections
+   ========================================================================== */
+
+.cube-face-content > .face-header {
+    flex-shrink: 0;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.cube-face-content > .face-footer {
+    flex-shrink: 0;
+    margin-top: auto;
+    padding-top: 15px;
+}
+
+.face-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+    display: block;
+}
+
+/* ==========================================================================
+   Face Title
+   ========================================================================== */
+
+.face-title {
+    margin: 0 0 2vmin 0;
+    font-size: clamp(1.25rem, 5vmin, 2rem);
+    font-weight: 600;
+    color: var(--color-txt, #333);
+}
+
+/* ==========================================================================
+   Content Wrapper from gcube_get_face_content()
+   ========================================================================== */
+
+.face-content {
+    display: block;
+    width: 100%;
+}
+
+.face-content-title {
+    display: block;
+    margin: 0 0 20px 0;
+    font-size: 3vmin;
+    color: var(--color-highlight, #e51022);
+}
+
+.face-content-body {
+    display: block;
+    width: 100%;
+}
+
+.face-content-body > * {
+    display: block;
+    margin-bottom: 15px;
+}
+
+.face-content-body > *:last-child {
+    margin-bottom: 0;
+}
+
+.face-content-body p {
+    display: block;
+    margin: 0 0 15px 0;
+}
+
+.face-content-body p:last-child {
+    margin-bottom: 0;
+}
+
+.face-content-body > div {
+    display: block;
+    margin-bottom: 15px;
+}
+
+/* ==========================================================================
+   Face Posts Container
+   ========================================================================== */
+
+.face-posts {
+    display: block;
+    width: 100%;
+}
+
+.face-posts > * {
+    display: block;
+    margin-bottom: 30px;
+}
+
+.face-posts > *:last-child {
+    margin-bottom: 0;
+}
+
+/* ==========================================================================
+   Face Visibility States
+   ========================================================================== */
+
+.face-hidden {
+    pointer-events: none;
+    transition: opacity 0.6s ease-in-out;
+}
+
+.face-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 0.6s ease-in-out;
+}
+
+.face-hidden .cube-face-content {
+    visibility: visible;
+}
+
+/* ==========================================================================
+   Loading State
+   ========================================================================== */
+
+.face.loading {
+    position: relative;
+}
+
+.face.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-top-color: var(--color-highlight, #e51022);
+    border-radius: 50%;
+    animation: cube-loading-spin 0.8s linear infinite;
+    z-index: 100;
+}
+
+/* Note: ::after is used for loading spinner, which conflicts with interior walls.
+   Consider using a separate loading element in HTML if both are needed. */
+
+/* Fade in content after loading */
+.face .cube-face-content {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.face[data-loaded="true"] .cube-face-content {
+    opacity: 1;
+}
+
+/* ==========================================================================
+   Loading State Alternative (using child element)
+   ========================================================================== */
+
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    text-align: center;
+}

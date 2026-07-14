@@ -1,0 +1,34 @@
+# gCube — config_schema
+#
+# gCube is a personalization / face-bundle library consumed via gCore
+# integrations; it is not a daemon. Config is published at install time
+# by the `geodineum` CLI one-shot.
+
+component: gcube
+entries:
+  - key: GCUBE_DEBUG
+    type: bool
+    default: false
+    mutable: true
+    capability: manage_options
+    description: Enables verbose face-bundle resolution logging.
+
+  - key: GCUBE_BUNDLE_TTL
+    type: int
+    default: 86400
+    mutable: true
+    description: Face-bundle cache TTL in seconds (per-site ValKey hash).
+
+  - key: GCUBE_MAX_BUNDLE_SIZE
+    type: int
+    default: 262144
+    mutable: false
+    description: Per-bundle soft cap (bytes); bundles above log a warning.
+
+  - key: GCUBE_CONTENT_SYNC_ENABLED
+    type: bool
+    default: true
+    mutable: true
+    description: >-
+      Master toggle for content-sync pub/sub. When false, gCube does not
+      subscribe to face-mapping invalidations.
