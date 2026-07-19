@@ -694,15 +694,25 @@
                 requestBody.slug = effectiveSlug;
             }
 
-            // Fetch from REST API
-            const response = await fetch('/wp-json/gcube/v1/render', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'text/html'
-                },
-                body: JSON.stringify(requestBody)
+            // Fetch from REST API. The parent theme's face endpoint is the
+            // canonical one: it renders whatever source the face is configured
+            // with (page/post/posts/custom). gcube/v1/render only exists where a
+            // template-render extension is installed, so it is the fallback --
+            // making it primary left every face empty on a plain install.
+            let response = await fetch(`/wp-json/gtemplate/v1/face/${faceId}`, {
+                headers: { 'Accept': 'text/html' }
             });
+
+            if (!response.ok) {
+                response = await fetch('/wp-json/gcube/v1/render', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'text/html'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+            }
 
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
