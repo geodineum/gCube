@@ -19,7 +19,7 @@ build:
   command: scripts/build-css.sh
 
 dirty-tree:
-  strategy: stash
+  strategy: discard
 
 cli:
   commands:
