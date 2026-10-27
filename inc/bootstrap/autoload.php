@@ -39,22 +39,14 @@ if (file_exists($composer_autoload)) {
 }
 
 //-----------------------------------------------------------------------------
-// Phase 2: Namespace alias for gNodeConfigLoader so legacy
-// `\gCube\gNodeConfigLoader::get(...)` callers continue to resolve. The real
-// class is `\gTemplate\gNodeConfigLoader` in the parent theme.
-//-----------------------------------------------------------------------------
-
-require_once GCUBE_INC_DIR . '/bootstrap/gNodeConfigLoader.php';
-
-//-----------------------------------------------------------------------------
-// Phase 3: Cube-specific assets (cube manifest + service worker, asset enqueue)
+// Phase 2: Cube-specific assets (cube manifest + service worker, asset enqueue)
 //-----------------------------------------------------------------------------
 
 require_once GCUBE_INC_DIR . '/assets/enqueue.php';
 require_once GCUBE_INC_DIR . '/assets/pwa-rewrite.php';
 
 //-----------------------------------------------------------------------------
-// Phase 4: Cube-specific rendering (glass-mode content source, content sync,
+// Phase 3: Cube-specific rendering (glass-mode content source, content sync,
 // direct template registration). Other content sources + face renderer come
 // from the parent.
 //-----------------------------------------------------------------------------
@@ -64,7 +56,7 @@ require_once GCUBE_INC_DIR . '/rendering/content-sync.php';
 require_once GCUBE_INC_DIR . '/rendering/template-registration-direct.php';
 
 //-----------------------------------------------------------------------------
-// Phase 5: Cube-specific integrations (bundle manifest
+// Phase 4: Cube-specific integrations (bundle manifest
 // for cube faces, key-based bundle/face cache).
 //-----------------------------------------------------------------------------
 
@@ -72,14 +64,14 @@ require_once GCUBE_INC_DIR . '/integrations/features/bundle-manifest.php';
 require_once GCUBE_INC_DIR . '/integrations/features/keybased.php';
 
 //-----------------------------------------------------------------------------
-// Phase 6: Cube-specific REST resource (face-mapping sync). Other REST
+// Phase 5: Cube-specific REST resource (face-mapping sync). Other REST
 // resources come from the parent's rest/index.php.
 //-----------------------------------------------------------------------------
 
 require_once GCUBE_INC_DIR . '/rest/resources/sync.php';
 
 //-----------------------------------------------------------------------------
-// Phase 7: Admin (cube usage analytics dashboard) — wp-admin only.
+// Phase 6: Admin (cube usage analytics dashboard) — wp-admin only.
 //-----------------------------------------------------------------------------
 
 if (is_admin()) {
@@ -87,7 +79,7 @@ if (is_admin()) {
 }
 
 //-----------------------------------------------------------------------------
-// Phase 8: WP-CLI (cube-specific commands; ecosystem commands live in the
+// Phase 7: WP-CLI (cube-specific commands; ecosystem commands live in the
 // parent and are exposed via `wp gtemplate ...`).
 //-----------------------------------------------------------------------------
 
@@ -96,7 +88,7 @@ if (defined('WP_CLI') && WP_CLI) {
 }
 
 //-----------------------------------------------------------------------------
-// Phase 9: Customizer. schema.php is the canonical setting-id/default map
+// Phase 8: Customizer. schema.php is the canonical setting-id/default map
 // every consumer resolves through; sanitizers come from parent gTemplate.
 //-----------------------------------------------------------------------------
 

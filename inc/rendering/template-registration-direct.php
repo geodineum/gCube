@@ -18,7 +18,9 @@ if (!defined('ABSPATH')) {
  * @param object $gNode gNode-Client instance
  */
 function gcube_register_templates_direct($gNode) {
-    error_log('gCube: Using DIRECT gNode template registration (fallback)');
+    if (GCUBE_DEBUG) {
+        error_log('gCube: Using DIRECT gNode template registration (fallback)');
+    }
 
     $template_dir = get_stylesheet_directory() . '/templates';
 
@@ -54,10 +56,12 @@ function gcube_register_templates_direct($gNode) {
                 );
 
                 if ($result) {
-                    error_log("gCube: ✅ Registered '{$template_name}' ({$type}) via direct gNode");
+                    if (GCUBE_DEBUG) {
+                        error_log("gCube: Registered '{$template_name}' ({$type}) via direct gNode");
+                    }
                     $registered_count++;
                 } else {
-                    error_log("gCube WARNING: ❌ Failed to register '{$template_name}' ({$type})");
+                    error_log("gCube WARNING: Failed to register '{$template_name}' ({$type})");
                     $failed_count++;
                 }
             } catch (\Throwable $e) {
@@ -67,5 +71,7 @@ function gcube_register_templates_direct($gNode) {
         }
     }
 
-    error_log("gCube: Direct registration complete - {$registered_count} registered, {$failed_count} failed");
+    if (GCUBE_DEBUG || $failed_count > 0) {
+        error_log("gCube: Direct registration complete - {$registered_count} registered, {$failed_count} failed");
+    }
 }

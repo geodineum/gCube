@@ -12,12 +12,11 @@ gCube = WordPress **child theme** = cube visual identity (3D 6-face geometry) + 
 - fcall `GNODE_CACHE_SET [] [$key,$json,$ttl,$site_id]`, `$key="{".$site_id."}:gnode:face_mapping"` → `inc/rendering/content-sync.php`; json flags `JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE`
 - customizer IDs `cube_face_N_{source,content_id,title,enabled,category_filter}` N=1..6 THEME MODS via `gcube_mod()/gcube_face_mod()` (DOM face 0-5 → setting 1-6) → `inc/customizer/schema.php`; content-sync.php
 - admin analytics submenu under `gcore-dashboard`, enqueues gated on `add_submenu_page()` hook suffix, needs `AnalyticsManager` → `inc/admin/analytics.php`
-- config-loader alias `\gTemplate\gNodeConfigLoader`→`\gCube\gNodeConfigLoader` → `inc/bootstrap/gNodeConfigLoader.php`
 - parent helpers `gtemplate_gnode() | gtemplate_gnode_keybased() | gtemplate_get_site_id()` → content-sync.php
 - keybased integration → `inc/integrations/features/keybased.php`
 
 ## ::ARCHITECTURE
-PHP (`inc/`). **No PSR-4** — explicit `require_once` via 9-phase bootstrap (`inc/bootstrap/autoload.php`). Dep `geodineum/gcore` (composer). Modules: (1) Bootstrap [constants, autoload, configloader alias] (2) Assets [CSS/JS enqueue (built-bundle-or-main.css), PWA manifest/sw rewrite gated on TWO conditions — Chapter-2 `gcore-manifest` ext present (`gcube_manifest_available()`, false under inert Ch.1 stub) AND `enable_pwa` default OFF; inert in base Ch.1] (3) Rendering [face content sources incl. glass, template sync, content-sync→ValKey] (4) Integrations [bundle-manifest nav sync, keybased cache — email→post is parent-owned, child copy deleted] (5) REST [sync-face-mapping] (6) Admin [analytics] (7) CLI [viewkey only] (8) Customizer [schema (canonical IDs+defaults), face controls, CSS out — sanitization parent-side `gtemplate_sanitize_option`]. Design: ALL gNode/ValKey ops route through `$gCore->getService()` — never direct client instantiation, never raw Redis/ValKey. Daemon comms via (a) `registerTemplate()` Tera sync (b) `fcall('GNODE_CACHE_SET')` face_mapping persist (c) `manifestSet/assetStore` bundle build. Philosophy: single-responsibility (cube-only); zero parent duplication (pre-launch cut ~14k LOC, e.g. `wp gcube register`→`wp gtemplate register`); platform-aware (gCore auto-detect env+site_id → multi-tenant, no hardcoding); graceful degradation (`GCUBE_FREE_TIER` → WP transients + PHP render if gNode down); transparent abstraction (gCore service layer respects ACL, enables backend swap).
+PHP (`inc/`). **No PSR-4** — explicit `require_once` via 8-phase bootstrap (`inc/bootstrap/autoload.php`). Dep `geodineum/gcore` (composer). Modules: (1) Bootstrap [constants, autoload] (2) Assets [CSS/JS enqueue (built-bundle-or-main.css), PWA manifest/sw rewrite gated on TWO conditions — Chapter-2 `gcore-manifest` ext present (`gcube_manifest_available()`, false under inert Ch.1 stub) AND `enable_pwa` default OFF; inert in base Ch.1] (3) Rendering [face content sources incl. glass, template sync, content-sync→ValKey] (4) Integrations [bundle-manifest nav sync, keybased cache — email→post is parent-owned, child copy deleted] (5) REST [sync-face-mapping] (6) Admin [analytics] (7) CLI [viewkey only] (8) Customizer [schema (canonical IDs+defaults), face controls, CSS out — sanitization parent-side `gtemplate_sanitize_option`]. Design: ALL gNode/ValKey ops route through `$gCore->getService()` — never direct client instantiation, never raw Redis/ValKey. Daemon comms via (a) `registerTemplate()` Tera sync (b) `fcall('GNODE_CACHE_SET')` face_mapping persist (c) `manifestSet/assetStore` bundle build. Philosophy: single-responsibility (cube-only); zero parent duplication (pre-launch cut ~14k LOC, e.g. `wp gcube register`→`wp gtemplate register`); platform-aware (gCore auto-detect env+site_id → multi-tenant, no hardcoding); graceful degradation (`GCUBE_FREE_TIER` → WP transients + PHP render if gNode down); transparent abstraction (gCore service layer respects ACL, enables backend swap).
 
 ## ::IO
 INPUTS:
@@ -45,7 +44,7 @@ PROVIDES:
 - customizer schema `cube_face_N_*` N=1..6 (theme mods, `gcube_mod/gcube_face_mod`)
 - admin analytics panel (under gcore-dashboard)
 CONSUMES:
-- gTemplate: parent theme (`style.css Template: gtemplate`), helpers `gtemplate_*`, `gNodeConfigLoader` alias, sanitizer `gtemplate_sanitize_option`, contact-form/email endpoint — HARD dep (fatal if absent)
+- gTemplate: parent theme (`style.css Template: gtemplate`), helpers `gtemplate_*`, sanitizer `gtemplate_sanitize_option`, contact-form/email endpoint — HARD dep (fatal if absent)
 - gCore: `$gCore` svc locator, `gnode_client` svc {registerTemplate, fcall, manifestSet, assetStore, getBundled, invalidateBundle}, `AnalyticsManager`, `Cache`
 - ValKey (via client): face_mapping key (write), unified:default stream (indirect, NOT direct), bundle cache (read)
 
@@ -84,5 +83,5 @@ ISOLATED_FROM: `{site_id}:config:*` keyspace (owned by gTemplate config.php) · 
 - "customizer = theme mods cube_face_N_* keyed 1..6; gcube_face_mod translates DOM face 0-5; schema.php single source of defaults"
 - "comms/email wire is parent-owned; gCube ships contact-form markup only, zero CommsManager refs"
 - "synchronous registerTemplate blocks; no deleteTemplate; non-atomic fcall sync"
-- "9-phase require_once bootstrap, no PSR-4; inc/; pre-launch cut ~14k dup LOC"
+- "8-phase require_once bootstrap, no PSR-4; inc/; pre-launch cut ~14k dup LOC"
 - "graceful degradation GCUBE_FREE_TIER → WP transients; auto-detect site_id+env from domain"

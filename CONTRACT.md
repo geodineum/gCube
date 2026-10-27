@@ -64,7 +64,6 @@ What gCube needs, and from which component.
 | **gTemplate parent theme** | gTemplate | Child-theme relationship `Template: gtemplate` in `style.css` | `style.css` |
 | **gCore framework** | gCore | Service locator singleton `$gCore` (WP global) with `getService(name)` returning managers implementing `ModuleInterface` | `inc/rendering/content-sync.php` |
 | **gNode-Client** | gCore (provides client) | `$gCore->getService('gnode_client')`; methods: `registerTemplate(id,content)`, `fcall(luaName,keys,args)`, `manifestSet(id,manifest)`, `assetStore(id,html,type,ttl)`, `getBundled(key)`, `invalidateBundle()` | `inc/rendering/content-sync.php`; `inc/integrations/features/keybased.php` |
-| **gNodeConfigLoader** | gTemplate | `\gTemplate\gNodeConfigLoader` aliased to `\gCube\gNodeConfigLoader` via `class_alias()` | `inc/bootstrap/gNodeConfigLoader.php` |
 | **Parent helper functions** | gTemplate | `gtemplate_gnode()`, `gtemplate_gnode_keybased()` → gNode-Client instances; `gtemplate_get_site_id()` → site ID string | `inc/rendering/content-sync.php` |
 | **ValKey stream** `{environment}:gnode:unified:default` | ValKey (via gNode-Client) | XREAD/XADD command/response stream; used internally by gNode-Client, **not directly accessed by gCube** | gNode-Client internals (gCore); no direct reference in gCube code |
 | **ValKey key** `{site_id}:gnode:face_mapping` | ValKey (written by gCube) | JSON face-mapping structure (see §4.1) | `inc/rendering/content-sync.php` |

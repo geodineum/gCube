@@ -25,8 +25,7 @@
  *   inc/
  *   ├── bootstrap/
  *   │   ├── constants.php          # GCUBE_VERSION / GCUBE_DIR / GCUBE_INC_DIR
- *   │   ├── autoload.php           # Slim loader for cube-only files
- *   │   └── gNodeConfigLoader.php  # \gCube\gNodeConfigLoader → \gTemplate alias
+ *   │   └── autoload.php           # Slim loader for cube-only files
  *   │
  *   ├── assets/
  *   │   ├── enqueue.php            # Cube asset enqueue (cube-3d JS, faces CSS)
