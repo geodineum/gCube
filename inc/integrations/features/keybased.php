@@ -23,22 +23,22 @@ use gCore\gNode\Storage\ValKeyStorage;
 use gCore\gNode\Exception\KeyBasedException;
 
 /**
- * Get gNode Client instance from global variable
- *
- * Note: KeyBasedClient was deprecated - gNodeClient is now the unified client
- * that supports both key-based and stream-based operations.
+ * gCore's gNode client (the unified key- and stream-based client), or null without gCore.
  *
  * @return gNodeClientInterface|null
  */
 function gcube_get_keybased_client(): ?gNodeClientInterface
 {
-    // Get from global variable (initialized in functions.php)
-    if (isset($GLOBALS['gcube_gnode_keybased_client'])) {
-        return $GLOBALS['gcube_gnode_keybased_client'];
+    global $gCore;
+    if (!$gCore || !method_exists($gCore, 'getService')) {
+        return null;
     }
-
-    error_log('[gCube KeyBased] gNode Client not initialized (missing global)');
-    return null;
+    try {
+        $client = $gCore->getService('gnode_client');
+    } catch (\Throwable $e) {
+        return null;
+    }
+    return $client instanceof gNodeClientInterface ? $client : null;
 }
 
 /**

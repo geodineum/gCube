@@ -524,20 +524,17 @@ function gcube_sync_face_mapping_to_valkey(): bool {
         if ($result !== false && $result !== null) {
             error_log("gCube: Face mapping synced to ValKey ({$key}) - " . strlen($json) . " bytes");
 
-            // Invalidate keybased-client bundle cache — folded in from the
-            // now-removed gcube_sync_face_configs_to_valkey hook so this
-            // single canonical hook performs both invalidation paths.
-            if (function_exists('gcube_invalidate_bundle')) {
-                gcube_invalidate_bundle();
+            // Drops the cached bundle and tells the daemon to rebuild it on the channel it
+            // listens to ({site}:events:invalidate without hash-tag braces).
+            if ($gNodeClient instanceof \gCore\gNode\gNodeClientInterface && method_exists($gNodeClient, 'invalidateBundle')) {
+                $gNodeClient->invalidateBundle();
             }
 
-            // Trigger bundle rebuild via invalidation event
-            gcube_trigger_bundle_rebuild($site_id);
-
-            // Sync to AssetManager manifest (new manifest-driven builder)
-            $assetManager = $gCore->getService('AssetManager');
-            if ($assetManager && $assetManager->isInitialized()) {
-                $assetManager->syncFaceMapping($mapping);
+            if ($gCore->hasService('AssetManager')) {
+                $assetManager = $gCore->getService('AssetManager');
+                if ($assetManager->isInitialized()) {
+                    $assetManager->syncFaceMapping($mapping);
+                }
             }
 
             return true;
@@ -820,37 +817,6 @@ function gcube_get_recent_posts_for_bundle(): array {
         'list' => $list,
         'by_id' => $by_id,
     ];
-}
-
-/**
- * Trigger bundle rebuild via invalidation event
- *
- * @param string $site_id Site identifier
- */
-function gcube_trigger_bundle_rebuild(string $site_id): void {
-    try {
-        global $gCore;
-        if (!$gCore) return;
-
-        $gNodeClient = $gCore->getService('gnode_client');
-        if (!$gNodeClient) return;
-
-        // Publish invalidation event
-        $channel = "{" . $site_id . "}:events:invalidate";
-        $payload = json_encode([
-            'event' => 'bundle_rebuild_requested',
-            'site_id' => $site_id,
-            'timestamp' => time(),
-        ]);
-
-        $storage = $gNodeClient->getStorage();
-        if ($storage && method_exists($storage, 'publish')) {
-            $storage->publish($channel, $payload);
-            error_log("gCube: Triggered bundle rebuild for {$site_id}");
-        }
-    } catch (\Throwable $e) {
-        error_log("gCube: Failed to trigger bundle rebuild: " . $e->getMessage());
-    }
 }
 
 // Hook: Sync face mapping when customizer is saved
