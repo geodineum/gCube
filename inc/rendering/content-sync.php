@@ -522,7 +522,9 @@ function gcube_sync_face_mapping_to_valkey(): bool {
         $result = $gNodeClient->fcall('GNODE_CACHE_SET', [], [$key, $json, $ttl, $site_id]);
 
         if ($result !== false && $result !== null) {
-            error_log("gCube: Face mapping synced to ValKey ({$key}) - " . strlen($json) . " bytes");
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("gCube: Face mapping synced to ValKey ({$key}) - " . strlen($json) . " bytes");
+            }
 
             // Drops the cached bundle and tells the daemon to rebuild it on the channel it
             // listens to ({site}:events:invalidate without hash-tag braces).
