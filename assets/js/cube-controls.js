@@ -956,8 +956,7 @@
         expandMode: 'focus',
         expandEnabled: true,
         showCloseButton: true,
-        showHint: true,
-        maxZoom: 90
+        showHint: true
     };
 
     /**
