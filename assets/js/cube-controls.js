@@ -1039,6 +1039,9 @@
         console.log('gCube: Found ' + faces.length + ' faces for expansion handlers');
 
         faces.forEach(face => {
+            // A pure glass face has nothing to expand
+            if (face.dataset.glass === 'true' && !face.dataset.glassContent) return;
+
             // Double-click for desktop
             face.addEventListener('dblclick', handleFaceDoubleClick);
 
