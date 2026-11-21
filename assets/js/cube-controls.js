@@ -162,7 +162,7 @@
                     if (existing && existing.isGlass && !existing.isGlassWithContent) return;
 
                     if (faceData.html && faceData.html.trim()) {
-                        face.innerHTML = faceData.html;
+                        face.replaceChildren(holdImages(faceData.html));
                         face.dataset.loaded = 'true';
                         face.classList.remove('loading');
 
@@ -192,6 +192,36 @@
         } else {
             setTimeout(doPreload, 500);
         }
+    }
+
+    /**
+     * Parse preloaded face HTML with its images held back: a face behind the
+     * front one would otherwise download every image at page load.
+     */
+    function holdImages(html) {
+        const tpl = document.createElement('template');
+        tpl.innerHTML = html;
+        tpl.content.querySelectorAll('img[src], img[srcset], source[srcset]').forEach(el => {
+            ['src', 'srcset', 'sizes'].forEach(a => {
+                if (el.hasAttribute(a)) {
+                    el.setAttribute('data-held-' + a, el.getAttribute(a));
+                    el.removeAttribute(a);
+                }
+            });
+        });
+        return tpl.content;
+    }
+
+    function releaseImages(face) {
+        face.querySelectorAll('[data-held-src], [data-held-srcset]').forEach(el => {
+            ['sizes', 'srcset', 'src'].forEach(a => {
+                const v = el.getAttribute('data-held-' + a);
+                if (v !== null) {
+                    el.setAttribute(a, v);
+                    el.removeAttribute('data-held-' + a);
+                }
+            });
+        });
     }
 
     /**
@@ -642,6 +672,7 @@
             console.error(`[gCube] Face ${faceId} not found`);
             return;
         }
+        releaseImages(face);
 
         // Check if this is a PURE glass mode face - NEVER load content
         // Glass+content faces DO load content (with transparent background)
