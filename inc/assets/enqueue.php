@@ -123,3 +123,69 @@ function gcube_get_js_settings(): array {
         'showHint' => (bool) get_theme_mod('gtemplate_expand_show_hint', true),
     ];
 }
+
+/**
+ * Glass box: the splat renderer (three.js + Spark, kept under assets/lib)
+ * loads only on sites with a splat set, as modules imported after page load.
+ */
+function gcube_splat_box_url(): string {
+    return trim((string) gcube_mod('cube_splat_url'));
+}
+
+function gcube_enqueue_splat_box(): void {
+    if (gcube_splat_box_url() === '' || !function_exists('wp_register_script_module')) {
+        return;
+    }
+    $base = GCUBE_URI . '/assets/';
+    $ver = static fn(string $path) => (string) (@filemtime(GCUBE_DIR . '/assets/' . $path) ?: GCUBE_VERSION);
+
+    wp_register_script_module('three', $base . 'lib/three/three.module.min.js', [], $ver('lib/three/three.module.min.js'));
+    wp_register_script_module('three/addons/postprocessing/Pass.js', $base . 'lib/three/addons/postprocessing/Pass.js', ['three'], $ver('lib/three/addons/postprocessing/Pass.js'));
+    wp_register_script_module('@sparkjsdev/spark', $base . 'lib/spark/spark.module.min.js', ['three', 'three/addons/postprocessing/Pass.js'], $ver('lib/spark/spark.module.min.js'));
+    wp_enqueue_script_module('gcube-splat-box', $base . 'js/splat-box.js', [
+        ['id' => 'three', 'import' => 'dynamic'],
+        ['id' => '@sparkjsdev/spark', 'import' => 'dynamic'],
+    ], $ver('js/splat-box.js'));
+}
+add_action('wp_enqueue_scripts', 'gcube_enqueue_splat_box', 30);
+
+function gcube_print_splat_box_config(): void {
+    $url = gcube_splat_box_url();
+    if ($url === '') {
+        return;
+    }
+    $config = [
+        'url' => esc_url_raw($url),
+        'flip' => (bool) gcube_mod('cube_splat_flip'),
+        'spin' => (int) gcube_mod('cube_splat_spin'),
+        'credit' => (string) gcube_mod('cube_splat_credit'),
+        'creditUrl' => esc_url_raw((string) gcube_mod('cube_splat_credit_url')),
+    ];
+    echo '<script type="application/json" id="gcube-splat-box">' . wp_json_encode($config, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) . "</script>\n";
+}
+add_action('wp_footer', 'gcube_print_splat_box_config', 5);
+
+// The renderer compiles WebAssembly and starts workers from data: URLs.
+add_filter('gtemplate_csp_script_src', static function (array $src): array {
+    return gcube_splat_box_url() === '' ? $src : [...$src, "'wasm-unsafe-eval'"];
+});
+add_filter('gtemplate_csp_worker_src', static function (array $src): array {
+    return gcube_splat_box_url() === '' ? $src : [...$src, "'self'", 'data:', 'blob:'];
+});
+
+// Splat captures can go in the Media Library (product pictures in the glass box).
+add_filter('upload_mimes', static function (array $mimes): array {
+    foreach (['splat', 'spz', 'ksplat', 'ply'] as $ext) {
+        $mimes[$ext] = 'application/octet-stream';
+    }
+    return $mimes;
+});
+add_filter('wp_check_filetype_and_ext', static function (array $data, $file, $filename): array {
+    $ext = strtolower(pathinfo((string) $filename, PATHINFO_EXTENSION));
+    if (in_array($ext, ['splat', 'spz', 'ksplat', 'ply'], true) && current_user_can('upload_files')) {
+        $data['ext'] = $ext;
+        $data['type'] = 'application/octet-stream';
+        $data['proper_filename'] = false;
+    }
+    return $data;
+}, 10, 3);

@@ -170,3 +170,41 @@ html, body {
     backface-visibility: visible;
     -webkit-backface-visibility: visible;
 }
+
+/* ==========================================================================
+   Glass Box Splat (assets/js/splat-box.js)
+   ========================================================================== */
+
+.gcube-splat-box {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s linear;
+}
+
+.gcube-splat-box.is-shown {
+    opacity: 1;
+}
+
+.gcube-splat-credit {
+    position: fixed;
+    left: 50%;
+    bottom: calc(50vh - var(--default-cubeheight, 80vmin) / 2 + 1.2vmin);
+    transform: translateX(-50%);
+    z-index: 2;
+    font-size: 12px;
+    color: var(--face-ink, #1b1712);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s linear;
+    text-decoration: none;
+}
+
+.gcube-splat-credit.is-shown {
+    opacity: 0.7;
+    pointer-events: auto;
+}

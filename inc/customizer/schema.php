@@ -61,6 +61,13 @@ function gcube_customizer_defaults(): array {
         'cube_four_bg_image'         => '',
         'cube_four_bg_size'          => 'cover',
 
+        // Glass box: a Gaussian splat inside the cube
+        'cube_splat_url'             => '',
+        'cube_splat_flip'            => 1,
+        'cube_splat_spin'            => 24,
+        'cube_splat_credit'          => '',
+        'cube_splat_credit_url'      => '',
+
         // Navigation styling
         'nav_button_style'           => 'sleek',
         'nav_button_padding'         => '10px 20px',
