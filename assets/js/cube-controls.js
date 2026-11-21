@@ -130,9 +130,7 @@
      */
     function preloadAllFaces() {
         const doPreload = function() {
-            // Determine the correct REST namespace from the theme
-            // (gcube/v1 for gCube, gtemplate/v1 for gTemplate)
-            const namespace = window.gCubeConfig?.restNamespace || 'gcube/v1';
+            const namespace = 'gtemplate/v1';
 
             console.log('[gCube] Preloading all faces via batch endpoint...');
 

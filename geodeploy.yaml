@@ -9,10 +9,9 @@ triggers:
   - match: "**/*.php"
     actions: [opcache-clear]
   # gcube.built.css is a gitignored build artifact — enqueue.php serves
-  # it when present and falls back to the 14-request @import waterfall
-  # when absent. Rebuild whenever CSS sources change so production never
-  # runs in dev mode.
-  - match: "assets/css/**"
+  # it when present and falls back to the main.css @import waterfall
+  # when absent. Rebuild whenever its sources or the script change.
+  - match: "assets/css/**|scripts/build-css.sh"
     actions: [build]
 
 build:
