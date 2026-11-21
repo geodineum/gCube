@@ -126,10 +126,15 @@ async function boot(config) {
     let last = performance.now();
     let running = false;
 
-    function frame(now) {
+    function updateShown() {
         const shown = glassInFront();
         canvas.classList.toggle('is-shown', shown);
         if (credit) credit.classList.toggle('is-shown', shown);
+        return shown;
+    }
+
+    function frame(now) {
+        const shown = updateShown();
         if (spinPerMs && !reduceMotion.matches) turntable.rotation.y += spinPerMs * (now - last);
         last = now;
         syncToCube();
@@ -143,6 +148,7 @@ async function boot(config) {
     }
 
     function wake() {
+        updateShown();
         if (!running) {
             running = true;
             last = performance.now();
