@@ -74,11 +74,13 @@ html, body {
     width: var(--default-cubewidth);
     padding: 0;
     border-radius: var(--default-margin);
-    overflow: hidden;
 
-    /* Enable 3D children for pseudo-element surfaces */
-    transform-style: preserve-3d;
-    -webkit-transform-style: preserve-3d;
+    /* Flat, not clipped: overflow: hidden on a face inside the rotated cube stops
+       Chrome hit-testing every turned face (no scroll, clicks or forms). Flat keeps
+       the look overflow: hidden gave; the content box clips itself. */
+    overflow: visible;
+    transform-style: flat;
+    -webkit-transform-style: flat;
 
     /* Face container is transparent - surfaces render via ::before/::after */
     background: transparent;
@@ -131,15 +133,18 @@ html, body {
 }
 
 /* ==========================================================================
-   Bottom Face Content Rotation
-   Content must be rotated 180deg to be readable when viewed from below
+   Top and Bottom Face Content
+   cube-controls.js sets --cap-turn to the cube's Y angle; turning the content
+   back by it keeps it upright whichever side the cube tipped from.
    ========================================================================== */
 
-#cube .six .cube-face-container,
-#cube .six > .cube-face-content,
-#cube .six .on-demand-content {
-    transform: rotate(180deg) !important;
-    -webkit-transform: rotate(180deg) !important;
+#cube .one .cube-face-container {
+    transform: rotate(calc(var(--cap-turn, 0deg) * var(--cap-sign-top, 1)));
+    transform-origin: center center;
+}
+
+#cube .six .cube-face-container {
+    transform: rotate(calc(var(--cap-turn, 0deg) * var(--cap-sign-bottom, -1)));
     transform-origin: center center;
 }
 

@@ -161,8 +161,10 @@
                     // Skip pure glass faces
                     if (existing && existing.isGlass && !existing.isGlassWithContent) return;
 
-                    if (faceData.html && faceData.html.trim()) {
-                        face.replaceChildren(holdImages(faceData.html));
+                    const container = face.querySelector('.cube-face-content');
+                    if (container && faceData.html && faceData.html.trim()) {
+                        container.replaceChildren(holdImages(faceData.html));
+                        executeScripts(container);
                         face.dataset.loaded = 'true';
                         face.classList.remove('loading');
 
@@ -179,6 +181,7 @@
                 });
 
                 console.log(`[gCube] Preloaded ${injected}/${data.count} faces (${data.rendered_by})`);
+                whenPageLoaded(() => document.querySelectorAll('[data-face-id]').forEach(releaseImages));
             })
             .catch(err => {
                 // Non-fatal: faces will load on-demand as before
@@ -210,6 +213,12 @@
             });
         });
         return tpl.content;
+    }
+
+    function whenPageLoaded(fn) {
+        const idle = () => ('requestIdleCallback' in window) ? requestIdleCallback(fn, { timeout: 4000 }) : setTimeout(fn, 1000);
+        if (document.readyState === 'complete') idle();
+        else window.addEventListener('load', idle, { once: true });
     }
 
     function releaseImages(face) {
@@ -261,6 +270,9 @@
             'rotateX(' + window.cubeRotationX + 'deg) ' +
             'rotateY(' + window.cubeRotationY + 'deg) ' +
             'rotateZ(0deg)';
+        // Top and bottom faces turn their content back by the cube's Y angle so
+        // they read upright from whichever side the cube tipped.
+        cube.style.setProperty('--cap-turn', (((window.cubeRotationY % 360) + 360) % 360) + 'deg');
     }
 
     /**
@@ -421,6 +433,7 @@
 
         currentFace = faceID;
         applyRotation();
+        revealFace(faceID);
 
         // Reset transition lock after animation completes
         setTimeout(() => {
@@ -435,9 +448,8 @@
     }
 
     /**
-     * Update face visibility classes
-     * IMPORTANT: Clears content from non-visible faces to prevent see-through text
-     * Content will be re-loaded when the face is rotated to again
+     * Update face visibility classes. Content stays in place; hidden faces' content
+     * is hidden by CSS so nothing shows through and nothing is fetched again.
      */
     function updateFaceVisibility(activeFaceId) {
         const allFaces = document.querySelectorAll('[data-face-id]');
@@ -451,32 +463,17 @@
             } else {
                 face.classList.remove('face-visible');
                 face.classList.add('face-hidden');
-
-                // CRITICAL: Clear content from non-visible faces
-                // This prevents text showing through from other faces
-                // Pure glass faces (no content) don't need clearing
-                // Glass+content faces DO need clearing (they have text that would show through)
-                const shouldClearContent = faceState && faceState.loaded &&
-                    (!faceState.isGlass || faceState.isGlassWithContent);
-
-                if (shouldClearContent) {
-                    const container = face.querySelector('.cube-face-content');
-                    if (container) {
-                        container.innerHTML = '';
-                    }
-                    // Mark as not loaded so it will reload when rotated to
-                    face.dataset.loaded = 'false';
-                    loadedFaces.set(faceId, {
-                        template: faceState.template,
-                        slug: faceState.slug,
-                        loaded: false,
-                        isGlass: faceState.isGlass,
-                        isGlassWithContent: faceState.isGlassWithContent
-                    });
-                    console.log(`[gCube] Cleared content from face ${faceId} (navigated away)`);
-                }
             }
         });
+    }
+
+    /** Show the face a turn is heading to while the turn runs. */
+    function revealFace(faceId) {
+        const face = document.querySelector(`[data-face-id="${faceId}"]`);
+        if (face) {
+            face.classList.remove('face-hidden');
+            face.classList.add('face-visible');
+        }
     }
 
     /**
@@ -538,6 +535,7 @@
 
         if (moved) {
             isTransitioning = true;
+            revealFace(currentFace);
             setTimeout(() => {
                 isTransitioning = false;
                 updateFaceVisibility(currentFace);
@@ -555,10 +553,22 @@
     let touchStartX = 0;
     let touchMoved = false;
 
+    let touchScroller = null;
+    let touchScrollTop = 0;
+
     function handleTouchStart(event) {
         touchStartY = event.touches[0].clientY;
         touchStartX = event.touches[0].clientX;
         touchMoved = false;
+        touchScroller = event.target.closest ? event.target.closest('.cube-face-container') : null;
+        touchScrollTop = touchScroller ? touchScroller.scrollTop : 0;
+    }
+
+    // Decided from where the face stood when the finger went down, so one swipe
+    // either scrolls or turns the cube, never both.
+    function canScroll(el, down) {
+        if (!el || el.scrollHeight <= el.clientHeight + 1) return false;
+        return down ? touchScrollTop + el.clientHeight < el.scrollHeight - 1 : touchScrollTop > 0;
     }
 
     function handleTouchMove(event) {
@@ -575,6 +585,8 @@
 
         let moved = false;
         let newFaceId = currentFace;
+
+        if (Math.abs(deltaY) >= Math.abs(deltaX) && canScroll(touchScroller, deltaY > 0)) return;
 
         // Determine if horizontal or vertical swipe
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
@@ -616,6 +628,7 @@
             touchStartY = 0;
 
             isTransitioning = true;
+            revealFace(currentFace);
             setTimeout(() => {
                 isTransitioning = false;
                 updateFaceVisibility(currentFace);

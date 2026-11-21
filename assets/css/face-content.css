@@ -19,6 +19,7 @@
     width: 100%;
     height: 100%;
     z-index: 2; /* Above pseudo-element surfaces */
+    border-radius: inherit;
 
     /* Scrolling behavior */
     -webkit-overflow-scrolling: touch;
@@ -182,7 +183,7 @@
 }
 
 .face-hidden .cube-face-content {
-    visibility: visible;
+    visibility: hidden;
 }
 
 /* ==========================================================================
