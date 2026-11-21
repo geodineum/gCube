@@ -42,11 +42,42 @@ function gcube_surface_context(): array {
 }
 
 /**
+ * Text colour for a face painted with these colours: dark ink where it contrasts more
+ * than light text (mean luminance above 0.2), '' (the site's text colour) when dark
+ * or unknown (image, glass).
+ *
+ * @param string[] $colors Hex (#rgb, #rrggbb) or rgb()/rgba() colours
+ */
+function gcube_ink_for(array $colors): string {
+    $lum = [];
+    foreach ($colors as $c) {
+        $c = trim((string) $c);
+        if (preg_match('/^#([0-9a-f]{3}|[0-9a-f]{6})$/i', $c, $m)) {
+            $hex = strlen($m[1]) === 3 ? preg_replace('/(.)/', '$1$1', $m[1]) : $m[1];
+            $rgb = array_map('hexdec', str_split($hex, 2));
+        } elseif (preg_match('/^rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/i', $c, $m)) {
+            $rgb = [(int) $m[1], (int) $m[2], (int) $m[3]];
+        } else {
+            continue;
+        }
+        $lin = array_map(static function ($v) {
+            $v /= 255;
+            return $v <= 0.03928 ? $v / 12.92 : (($v + 0.055) / 1.055) ** 2.4;
+        }, $rgb);
+        $lum[] = 0.2126 * $lin[0] + 0.7152 * $lin[1] + 0.0722 * $lin[2];
+    }
+    if (!$lum) {
+        return '';
+    }
+    return array_sum($lum) / count($lum) > 0.2 ? '#1b1712' : '';
+}
+
+/**
  * Compute the exterior + interior surface for one face.
  *
  * @param int        $i   Face number (1-6, customizer numbering)
  * @param array|null $ctx gcube_surface_context() (computed when null)
- * @return array{front_bg:string, front_bg_size:string, front_animation:string, back_bg:string, back_bg_size:string}
+ * @return array{front_bg:string, front_bg_size:string, front_animation:string, back_bg:string, back_bg_size:string, ink:string}
  */
 function gcube_face_surface(int $i, ?array $ctx = null): array {
     $h = 'gtemplate_prepend_hash';
@@ -65,12 +96,15 @@ function gcube_face_surface(int $i, ?array $ctx = null): array {
     $front_bg = '';
     $front_bg_size = $ctx['bg_size'];
     $front_animation = $ctx['animation'];
+    $paint = ($ctx['bg_style'] === 'solid') ? [$ctx['grad'][1]] : array_values($ctx['grad']);
 
     if ($bg_type === 'solid') {
         $front_bg = $h(gcube_mod("cube_face_{$i}_bg_color"));
         $front_bg_size = 'auto';
         $front_animation = 'none';
+        $paint = [$front_bg];
     } elseif ($bg_type === 'custom_gradient') {
+        $paint = [$grad1, $grad2, $grad3, $grad4];
         $animate = gcube_mod("cube_face_{$i}_grad_animate");
         $grad_type = gcube_mod("cube_face_{$i}_grad_type");
         $grad_direction = gcube_mod("cube_face_{$i}_grad_direction");
@@ -104,14 +138,17 @@ function gcube_face_surface(int $i, ?array $ctx = null): array {
             $front_bg = "url('" . esc_url($bg_image) . "')";
             $front_bg_size = esc_attr(gcube_mod("cube_face_{$i}_bg_size"));
             $front_animation = 'none';
+            $paint = [];
         }
     } elseif ($bg_type === 'transparent') {
+        $paint = [];
         $front_bg = 'transparent';
         $front_bg_size = 'auto';
         $front_animation = 'none';
     } elseif ($bg_type === 'default') {
         if ($has_custom_colors) {
             $front_bg = "linear-gradient(270deg, {$grad1}, {$grad2}, {$grad3}, {$grad4})";
+            $paint = [$grad1, $grad2, $grad3, $grad4];
         }
     }
 
@@ -120,6 +157,7 @@ function gcube_face_surface(int $i, ?array $ctx = null): array {
         $front_bg = 'var(--semi-transparant)';
         $front_bg_size = 'auto';
         $front_animation = 'none';
+        $paint = [];
     }
 
     // Face 4 (back) global image
@@ -129,6 +167,7 @@ function gcube_face_surface(int $i, ?array $ctx = null): array {
             $front_bg = "url('" . esc_url($cube_four_bg_image) . "')";
             $front_bg_size = esc_attr(gcube_mod('cube_four_bg_size'));
             $front_animation = 'none';
+            $paint = [];
         }
     }
 
@@ -163,6 +202,7 @@ function gcube_face_surface(int $i, ?array $ctx = null): array {
         'front_animation' => $front_animation,
         'back_bg' => $back_bg,
         'back_bg_size' => $back_bg_size,
+        'ink' => gcube_ink_for($paint),
     ];
 }
 
@@ -240,8 +280,11 @@ add_filter('gtemplate_dynamic_css', function ($css) {
         $face_class = $face_classes[$i];
         $surface = gcube_face_surface($i, $ctx);
 
-        if (!empty($surface['front_bg']) || !empty($surface['back_bg'])) {
+        if (!empty($surface['front_bg']) || !empty($surface['back_bg']) || $surface['ink'] !== '') {
             $css .= "#cube {$face_class}{";
+            if ($surface['ink'] !== '') {
+                $css .= "--face-ink:{$surface['ink']};";
+            }
             if (!empty($surface['front_bg'])) {
                 $css .= "--face-front-bg:{$surface['front_bg']};--face-front-bg-size:{$surface['front_bg_size']};--face-front-animation:{$surface['front_animation']};";
             }
