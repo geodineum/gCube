@@ -74,7 +74,7 @@ function gcube_enqueue_assets(): void {
         'gcube-cube-controls',
         $theme_uri . '/assets/js/cube-controls.js',
         [],
-        $version,
+        (string) (@filemtime($theme_dir . '/assets/js/cube-controls.js') ?: $version),
         ['in_footer' => true, 'strategy' => 'defer']
     );
 
@@ -89,7 +89,7 @@ function gcube_enqueue_assets(): void {
         'gcube-pwa-loader',
         $theme_uri . '/assets/js/pwa-loader.js',
         [],
-        $version,
+        (string) (@filemtime($theme_dir . '/assets/js/pwa-loader.js') ?: $version),
         ['in_footer' => true, 'strategy' => 'defer']
     );
 }
