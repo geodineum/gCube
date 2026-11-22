@@ -27,8 +27,12 @@ if (configEl && sceneEl && cubeEl) {
 }
 
 async function boot(config) {
-    const probe = document.createElement('canvas');
-    if (!probe.getContext('webgl2')) return;
+    const gl = document.createElement('canvas').getContext('webgl2');
+    if (!gl) return;
+    // A software rasteriser draws a large splat in seconds per frame and freezes the page.
+    const info = gl.getExtension('WEBGL_debug_renderer_info');
+    const gpu = info ? String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
+    if (/swiftshader|llvmpipe|softpipe|software|basic render/i.test(gpu) && !config.allowSoftware) return;
 
     const THREE = await import('../lib/three/three.module.min.js');
     const { SparkRenderer, SplatMesh } = await import('../lib/spark/spark.module.min.js');
@@ -125,6 +129,9 @@ async function boot(config) {
 
     let last = performance.now();
     let running = false;
+    // Slow device: after the first frames take long, no turntable and a frame only when the cube moves.
+    const drawn = [];
+    let slow = false;
 
     function updateShown() {
         const shown = glassInFront();
@@ -135,12 +142,17 @@ async function boot(config) {
 
     function frame(now) {
         const shown = updateShown();
-        if (spinPerMs && !reduceMotion.matches) turntable.rotation.y += spinPerMs * (now - last);
+        if (spinPerMs && !slow && !reduceMotion.matches) turntable.rotation.y += spinPerMs * (now - last);
+        // the gap between frames, not the render call: the GPU's work shows up there
+        if (drawn.length < 6) {
+            drawn.push(now - last);
+            if (drawn.length === 6) slow = drawn.slice(1).sort((a, b) => a - b)[2] > 120;
+        }
         last = now;
         syncToCube();
         renderer.render(world, camera);
-        // keep drawing while shown and through the fade-out
-        if (shown || getComputedStyle(canvas).opacity !== '0') {
+        // keep drawing while shown and through the fade-out (a slow device: once per wake)
+        if (!slow && (shown || getComputedStyle(canvas).opacity !== '0')) {
             requestAnimationFrame(frame);
         } else {
             running = false;
@@ -160,5 +172,6 @@ async function boot(config) {
     window.addEventListener('resize', () => { resize(); wake(); });
     new MutationObserver(wake).observe(cubeEl, { subtree: true, attributes: true, attributeFilter: ['class', 'style'] });
     new MutationObserver(wake).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    cubeEl.addEventListener('transitionend', wake);
     wake();
 }
