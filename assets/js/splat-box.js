@@ -30,8 +30,8 @@ async function boot(config) {
     const probe = document.createElement('canvas');
     if (!probe.getContext('webgl2')) return;
 
-    const THREE = await import('three');
-    const { SparkRenderer, SplatMesh } = await import('@sparkjsdev/spark');
+    const THREE = await import('../lib/three/three.module.min.js');
+    const { SparkRenderer, SplatMesh } = await import('../lib/spark/spark.module.min.js');
 
     const canvas = document.createElement('canvas');
     canvas.className = 'gcube-splat-box';

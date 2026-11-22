@@ -77,23 +77,25 @@
                 console.log(`[gCube] Face ${faceId} is pure glass mode - no content will be loaded`);
             } else if (isGlassWithContent) {
                 // Glass+content faces load content but keep transparent background
-                face.dataset.loaded = 'false';
+                const rendered = face.dataset.rendered === 'true';
+                face.dataset.loaded = rendered ? 'true' : 'false';
                 loadedFaces.set(faceId, {
-                    template: null,
+                    template: rendered ? `face_${faceId}` : null,
                     slug: null,
-                    loaded: false,
+                    loaded: rendered,
                     isGlass: true,
                     isGlassWithContent: true
                 });
                 console.log(`[gCube] Face ${faceId} is glass+content mode - will load content with transparent bg`);
             } else {
-                // Non-glass faces start as NOT loaded (content loads on rotation)
-                // Clear any pre-set loaded state
-                face.dataset.loaded = 'false';
+                // A face the server already rendered (a standalone cube renders all six) stays
+                // loaded; otherwise it loads on rotation or from the preload.
+                const rendered = face.dataset.rendered === 'true';
+                face.dataset.loaded = rendered ? 'true' : 'false';
                 loadedFaces.set(faceId, {
-                    template: null,
+                    template: rendered ? `face_${faceId}` : null,
                     slug: null,
-                    loaded: false,
+                    loaded: rendered,
                     isGlass: false,
                     isGlassWithContent: false
                 });
@@ -129,6 +131,7 @@
      * Uses requestIdleCallback so it doesn't block initial render.
      */
     function preloadAllFaces() {
+        if (![...loadedFaces.values()].some(f => !f.loaded && (!f.isGlass || f.isGlassWithContent))) return;
         const doPreload = function() {
             const namespace = 'gtemplate/v1';
 

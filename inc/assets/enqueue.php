@@ -125,8 +125,8 @@ function gcube_get_js_settings(): array {
 }
 
 /**
- * Glass box: the splat renderer (three.js + Spark, kept under assets/lib)
- * loads only on sites with a splat set, as modules imported after page load.
+ * Glass box: the splat renderer (three.js + Spark under assets/lib, imported by relative path, so no
+ * import map) loads only on sites with a splat set, after page load.
  */
 function gcube_splat_box_url(): string {
     return trim((string) gcube_mod('cube_splat_url'));
@@ -136,16 +136,8 @@ function gcube_enqueue_splat_box(): void {
     if (gcube_splat_box_url() === '' || !function_exists('wp_register_script_module')) {
         return;
     }
-    $base = GCUBE_URI . '/assets/';
-    $ver = static fn(string $path) => (string) (@filemtime(GCUBE_DIR . '/assets/' . $path) ?: GCUBE_VERSION);
-
-    wp_register_script_module('three', $base . 'lib/three/three.module.min.js', [], $ver('lib/three/three.module.min.js'));
-    wp_register_script_module('three/addons/postprocessing/Pass.js', $base . 'lib/three/addons/postprocessing/Pass.js', ['three'], $ver('lib/three/addons/postprocessing/Pass.js'));
-    wp_register_script_module('@sparkjsdev/spark', $base . 'lib/spark/spark.module.min.js', ['three', 'three/addons/postprocessing/Pass.js'], $ver('lib/spark/spark.module.min.js'));
-    wp_enqueue_script_module('gcube-splat-box', $base . 'js/splat-box.js', [
-        ['id' => 'three', 'import' => 'dynamic'],
-        ['id' => '@sparkjsdev/spark', 'import' => 'dynamic'],
-    ], $ver('js/splat-box.js'));
+    $file = GCUBE_DIR . '/assets/js/splat-box.js';
+    wp_enqueue_script_module('gcube-splat-box', GCUBE_URI . '/assets/js/splat-box.js', [], (string) (@filemtime($file) ?: GCUBE_VERSION));
 }
 add_action('wp_enqueue_scripts', 'gcube_enqueue_splat_box', 30);
 
