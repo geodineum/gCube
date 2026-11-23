@@ -1,4 +1,4 @@
 three.js r187 (npm three@0.187.0: build/three.module.min.js, build/three.core.min.js saved as three.core.js because the module imports that name, and examples/jsm/postprocessing/Pass.js), MIT.
 Spark 2.4.0 (npm @sparkjsdev/spark, dist/spark.module.min.js), MIT.
-Used by assets/js/splat-box.js; loaded only when the Customizer "Glass Box Splat" is set.
 Bare imports rewritten to relative paths when copied (spark: "three" and the Pass.js add-on; Pass.js: 'three'), so no import map is needed.
+Loaded only by ../js/splat-box.js and ../js/splat-stage.js, and only on a page that shows a splat.
